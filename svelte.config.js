@@ -6,12 +6,12 @@ const config = {
   kit: {
     adapter: adapter({
       pages: 'docs',
-      assets: 'docs'
+      assets: 'docs',
+      strict: false
     }),
     paths: {
       base: '/browser-home'
-    },
-    target: '#svelte'
+    }
   }
 };
 
