@@ -1,14 +1,23 @@
 <!doctype html>
 <html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>New Tab</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script src="scripts.js" defer></script>
+  </head>
 
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>New Tab</title>
-</head>
-
-<body>
-  <h1>Hello World</h1>
-</body>
-
+  <body>
+    <div id="page-indicator">
+      <button id="goto-page1" onclick="toPage(0)">1</button>
+      <button id="goto-page2" onclick="toPage(1)">2</button>
+    </div>
+    <section id="page1">
+      <h1>HonsonCooky</h1>
+    </section>
+    <section id="page2">
+      <h1>Page 2</h1>
+    </section>
+  </body>
 </html>
