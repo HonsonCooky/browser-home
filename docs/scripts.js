@@ -17,24 +17,26 @@ function toPage(pageNum) {
   for (let i = 0; i < pages.length; i++) {
     const page = pages[i].page;
     const btn = pages[i].btn;
+    const highCol = "rgba(var(--lavender), 0.5)";
+    const normCol = "rgba(var(--overlay0), 0.5)";
 
     if (pageNum === undefined) {
-      const pageX = page.getBoundingClientRect().x;
+      const pageX = Math.floor(page.getBoundingClientRect().x);
       if (pageX === 0) {
-        btn.style.background = "var(--lavender)";
+        btn.style.background = highCol;
       } else {
-        btn.style.background = "var(--overlay0)";
+        btn.style.background = normCol;
       }
       continue;
     }
 
     if (i != pageNum) {
-      btn.style.background = "var(--overlay0)";
+      btn.style.background = normCol;
       continue;
     }
 
     page.scrollIntoView({ behavior: "smooth" });
-    btn.style.background = "var(--lavender)";
+    btn.style.background = highCol;
   }
 }
 
