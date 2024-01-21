@@ -1,4 +1,11 @@
 {
+  "name": "browser-home",
+  "version": "1.0.0",
+  "description": "",
+  "main": "./docs/index.html",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
   "devDependencies": {
     "prettier": "^3.2.4",
     "prettier-plugin-css-order": "^2.0.1"

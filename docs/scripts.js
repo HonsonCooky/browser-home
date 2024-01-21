@@ -74,19 +74,10 @@ document.addEventListener("keydown", (event) => {
 // -----------------------------------------------------------------------------------------------------------------
 // # SHORTCUT LOADING
 // -----------------------------------------------------------------------------------------------------------------
+const vimShortcuts = document.getElementById("vim-shortcuts")
 fetch("./assets/vim-shortcuts.json")
   .then((response) => response.json())
-  .then((data) => console.log("FETCH", data));
-
-const xhr = new XMLHttpRequest();
-xhr.open("GET", "./assets/vim-shortcuts.json", true);
-xhr.onreadystatechange = function () {
-  if (this.readyState === 4 && this.status === 200) {
-    const data = JSON.parse(this.responseText);
-    console.log("XML", data);
-  }
-};
-xhr.send();
+  .then((data) => );
 
 // -----------------------------------------------------------------------------------------------------------------
 // # STARTUP
