@@ -1,3 +1,6 @@
+// -----------------------------------------------------------------------------------------------------------------
+// # PAGE INDICATOR BUTTONS
+// -----------------------------------------------------------------------------------------------------------------
 const pages = [
   {
     page: document.getElementById("page1"),
@@ -8,10 +11,6 @@ const pages = [
     btn: document.getElementById("goto-page2"),
   },
 ];
-
-// -----------------------------------------------------------------------------------------------------------------
-// PAGE INDICATOR BUTTONS
-// -----------------------------------------------------------------------------------------------------------------
 
 function toPage(pageNum) {
   for (let i = 0; i < pages.length; i++) {
@@ -49,15 +48,16 @@ function currentPageIndex() {
 }
 
 // -----------------------------------------------------------------------------------------------------------------
-// KEYBOARD EVENTS
+// # KEYBOARD EVENTS
 // -----------------------------------------------------------------------------------------------------------------
 document.addEventListener("keydown", (event) => {
-  console.log(event.key, currentPageIndex());
   switch (event.key) {
     case "1":
+    case "S":
       toPage(0);
       break;
     case "2":
+    case "T":
       toPage(1);
       break;
     case "k":
@@ -72,6 +72,23 @@ document.addEventListener("keydown", (event) => {
 });
 
 // -----------------------------------------------------------------------------------------------------------------
-// STARTUP
+// # SHORTCUT LOADING
+// -----------------------------------------------------------------------------------------------------------------
+fetch("./assets/vim-shortcuts.json")
+  .then((response) => response.json())
+  .then((data) => console.log("FETCH", data));
+
+const xhr = new XMLHttpRequest();
+xhr.open("GET", "./assets/vim-shortcuts.json", true);
+xhr.onreadystatechange = function () {
+  if (this.readyState === 4 && this.status === 200) {
+    const data = JSON.parse(this.responseText);
+    console.log("XML", data);
+  }
+};
+xhr.send();
+
+// -----------------------------------------------------------------------------------------------------------------
+// # STARTUP
 // -----------------------------------------------------------------------------------------------------------------
 toPage();
