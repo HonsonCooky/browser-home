@@ -139,13 +139,13 @@ section {
   border-radius: 1vh;
   padding: 0;
   max-width: 46vw;
-  max-height: 100%;
+  max-height: 40vh;
 }
 
 section:focus-within {
   border: 2px dotted rgba(var(--red));
   max-width: calc(46vw - 2px);
-  max-height: calc(100% - 2px);
+  max-height: calc(40vh - 2px);
 }
 
 div[id*="-0"].sub-section {
@@ -153,7 +153,6 @@ div[id*="-0"].sub-section {
   border: none;
   border-radius: 1vh;
   background: rgba(var(--crust));
-  max-height: 80vh;
   overflow-y: scroll;
 }
 

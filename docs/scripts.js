@@ -55,10 +55,12 @@ function currentPageIndex() {
 
 const vimTitle = "Vim Shortcuts";
 const edgeTitle = "Edge Shortcuts";
+const vimiumTitle = "Browser Vim Shortcuts";
 
 function shortcutsPageKeyBindings(event) {
   const vimSubSection = document.getElementById(`${vimTitle}-0`);
   const edgeSubSection = document.getElementById(`${edgeTitle}-0`);
+  const vimiumSubSection = document.getElementById(`${vimiumTitle}-0`);
   switch (event.key) {
     case "v":
       vimSubSection.tabIndex = -1;
@@ -68,9 +70,13 @@ function shortcutsPageKeyBindings(event) {
       edgeSubSection.tabIndex = -1;
       edgeSubSection.focus();
       break;
+    case "b":
+      vimiumSubSection.tabIndex = -1;
+      vimiumSubSection.focus();
+      break;
     case "/":
     case "s":
-      if (document.activeElement === vimSubSection || document.activeElement == edgeSubSection) {
+      if (document.activeElement.id.toLowerCase().includes("shortcuts")) {
         event.preventDefault();
         document.getElementById(document.activeElement.id + "-input").focus();
       }
@@ -229,6 +235,7 @@ function createSearchBox(searchElement) {
 // -----------------------------------------------------------------------------------------------------------------
 const vimShortcuts = document.getElementById("vim-shortcuts");
 const edgeShortcuts = document.getElementById("edge-shortcuts");
+const vimiumShortcuts = document.getElementById("vimium-shortcuts");
 
 function createSubSection(key, level) {
   const div = document.createElement("div");
@@ -287,6 +294,10 @@ fetch("./assets/vim-shortcuts.json")
 fetch("./assets/edge-shortcuts.json")
   .then((response) => response.json())
   .then((data) => edgeShortcuts.appendChild(createShortcut(edgeTitle, data, 0)));
+
+fetch("./assets/vimium-shortcuts.json")
+  .then((response) => response.json())
+  .then((data) => vimiumShortcuts.appendChild(createShortcut(vimiumTitle, data, 0)));
 
 // -----------------------------------------------------------------------------------------------------------------
 // # STARTUP
