@@ -13,6 +13,8 @@ const pages = [
 ];
 
 function toPage(pageNum) {
+  if (document.activeElement.tagName.toLowerCase() === "input") return;
+
   for (let i = 0; i < pages.length; i++) {
     const page = pages[i].page;
     const btn = pages[i].btn;
@@ -50,25 +52,84 @@ function currentPageIndex() {
 // -----------------------------------------------------------------------------------------------------------------
 // # KEYBOARD EVENTS
 // -----------------------------------------------------------------------------------------------------------------
-document.addEventListener("keydown", (event) => {
+
+const vimTitle = "Vim Shortcuts";
+const edgeTitle = "Edge Shortcuts";
+
+function shortcutsPageKeyBindings(event) {
+  const vimSubSection = document.getElementById(`${vimTitle}-0`);
+  const edgeSubSection = document.getElementById(`${edgeTitle}-0`);
   switch (event.key) {
-    case "1":
-    case "S":
-      toPage(0);
+    case "v":
+      vimSubSection.tabIndex = -1;
+      vimSubSection.focus();
       break;
-    case "2":
-    case "T":
-      toPage(1);
+    case "e":
+      edgeSubSection.tabIndex = -1;
+      edgeSubSection.focus();
       break;
-    case "k":
-    case "ArrowUp":
-      toPage(Math.min(pages.length - 1, currentPageIndex() + 1));
-      break;
-    case "j":
-    case "ArrowDown":
-      toPage(Math.max(0, currentPageIndex() - 1));
+    case "/":
+    case "s":
+      if (document.activeElement === vimSubSection || document.activeElement == edgeSubSection) {
+        event.preventDefault();
+        document.getElementById(document.activeElement.id + "-input").focus();
+      }
       break;
   }
+}
+
+function toolsPageKeyBindings(event) {
+  switch (event.key) {
+  }
+}
+
+function pageBasedEvents(event) {
+  switch (currentPageIndex()) {
+    case 0:
+      shortcutsPageKeyBindings(event);
+      break;
+    case 1:
+      toolsPageKeyBindings(event);
+      break;
+  }
+}
+
+function scrollActiveElementBy(scrollBy) {
+  document.activeElement.scroll({
+    top: document.activeElement.scrollTop + scrollBy,
+    left: 0,
+    behavior: "smooth",
+  });
+}
+
+function getRem() {
+  return parseFloat(getComputedStyle(document.documentElement).fontSize);
+}
+
+document.addEventListener("keydown", (event) => {
+  if (document.activeElement.id.includes("input")) return;
+
+  switch (event.key) {
+    case "j":
+      scrollActiveElementBy(50);
+      return;
+    case "k":
+      scrollActiveElementBy(-50);
+      return;
+    case "d":
+      scrollActiveElementBy(document.activeElement.getBoundingClientRect().height - getRem() * 8);
+      return;
+    case "u":
+      scrollActiveElementBy(-(document.activeElement.getBoundingClientRect().height - getRem() * 8));
+      return;
+    case "l":
+      toPage(Math.min(pages.length - 1, currentPageIndex() + 1));
+      return;
+    case "h":
+      toPage(Math.max(0, currentPageIndex() - 1));
+      return;
+  }
+  pageBasedEvents(event);
 });
 
 // -----------------------------------------------------------------------------------------------------------------
@@ -87,6 +148,22 @@ function createSearchBox(searchElement) {
     element.scrollIntoView({ block: "center", inline: "nearest", behavior: "smooth" });
   }
 
+  function isSubsequence(query, element) {
+    const children = [...element.childNodes].filter((child) => child.nodeType === Node.TEXT_NODE);
+    if (children.length === 0) return false;
+    const child = children[0].nodeValue;
+    let lastIndex = 0;
+    const queryChars = query.toLowerCase().split("");
+    const childChars = child.toLowerCase().split("");
+    for (let i = 0; i < queryChars.length; i++) {
+      const nextIndex = childChars.indexOf(queryChars[i], lastIndex);
+      const diff = nextIndex - lastIndex;
+      if (nextIndex === -1 || (lastIndex != 0 && diff > 2)) return false;
+      lastIndex = nextIndex;
+    }
+    return true;
+  }
+
   function searchChildren(element, query, depth) {
     if (depth === 0 && query != prevQuery) {
       matches = [];
@@ -94,12 +171,14 @@ function createSearchBox(searchElement) {
       prevQuery = query;
     }
 
-    const parent = element.parentNode;
-    parent.classList.remove(mark);
-    parent.classList.remove(highlight);
-    if (element.nodeType === Node.TEXT_NODE && query.length > 0 && element.nodeValue.includes(query)) {
-      parent.classList.add(mark);
-      matches.push(parent);
+    if (element.classList) {
+      element.classList.remove(mark);
+      element.classList.remove(highlight);
+    }
+
+    if (query.length > 0 && isSubsequence(query, element)) {
+      element.classList.add(mark);
+      matches.push(element);
     }
 
     for (let i = 0; i < element.childNodes.length; i++) {
@@ -124,10 +203,12 @@ function createSearchBox(searchElement) {
   }
 
   const searchBox = document.createElement("input");
+  searchBox.id = searchElement.id + "-input";
   searchBox.type = "text";
-  searchBox.placeholder = "Search";
+  const shortcut = searchElement.id[0].toLowerCase();
+  searchBox.placeholder = `Search [${shortcut},s || ${shortcut},/]`;
 
-  searchBox.addEventListener("keydown", function(event) {
+  searchBox.addEventListener("keydown", function (event) {
     if (event.key === "Enter") {
       event.preventDefault();
       if (this.value != prevQuery) searchChildren(searchElement, this.value, 0);
@@ -136,6 +217,8 @@ function createSearchBox(searchElement) {
       } else {
         findNext();
       }
+    } else if (event.key === "Escape") {
+      searchBox.blur();
     }
   });
   return searchBox;
@@ -199,11 +282,11 @@ function createShortcut(key, value, level) {
 
 fetch("./assets/vim-shortcuts.json")
   .then((response) => response.json())
-  .then((data) => vimShortcuts.appendChild(createShortcut("Vim Shortcuts", data, 0)));
+  .then((data) => vimShortcuts.appendChild(createShortcut(vimTitle, data, 0)));
 
 fetch("./assets/edge-shortcuts.json")
   .then((response) => response.json())
-  .then((data) => edgeShortcuts.appendChild(createShortcut("Edge Shortcuts", data, 0)));
+  .then((data) => edgeShortcuts.appendChild(createShortcut(edgeTitle, data, 0)));
 
 // -----------------------------------------------------------------------------------------------------------------
 // # STARTUP
