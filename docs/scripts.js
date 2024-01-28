@@ -53,9 +53,9 @@ function currentPageIndex() {
 // # KEYBOARD EVENTS
 // -----------------------------------------------------------------------------------------------------------------
 
-const vimTitle = "Vim Shortcuts";
-const edgeTitle = "Edge Shortcuts";
-const vimiumTitle = "Browser Vim Shortcuts";
+const vimTitle = "Vim [v]";
+const edgeTitle = "Edge [e]";
+const vimiumTitle = "Vimium [b]";
 
 function shortcutsPageKeyBindings(event) {
   const vimSubSection = document.getElementById(`${vimTitle}-0`);
@@ -76,9 +76,10 @@ function shortcutsPageKeyBindings(event) {
       break;
     case "/":
     case "s":
-      if (document.activeElement.id.toLowerCase().includes("shortcuts")) {
+      const input = document.activeElement.querySelector("input");
+      if (input) {
         event.preventDefault();
-        document.getElementById(document.activeElement.id + "-input").focus();
+        input.focus();
       }
       break;
   }
@@ -211,8 +212,7 @@ function createSearchBox(searchElement) {
   const searchBox = document.createElement("input");
   searchBox.id = searchElement.id + "-input";
   searchBox.type = "text";
-  const shortcut = searchElement.id[0].toLowerCase();
-  searchBox.placeholder = `Search [${shortcut},s || ${shortcut},/]`;
+  searchBox.placeholder = `Search`;
 
   searchBox.addEventListener("keydown", function (event) {
     if (event.key === "Enter") {

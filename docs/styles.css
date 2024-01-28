@@ -169,43 +169,65 @@ div[id*="-0"].sub-section::-webkit-scrollbar {
   align-items: center;
   z-index: 10;
   background: rgba(var(--crust));
-  padding: 0 2vw;
+  padding: 1vh 2vw;
 }
 
 .sub-section>.header-container>h2 {
   flex: 0.7;
+  margin: 0;
+  padding: 0;
   max-width: 50%;
   overflow: hidden;
+  font-weight: 800;
+  font-size: 1rem;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .sub-section>.header-container>input {
   flex: 0.3;
+  border: none;
+  border-radius: 100vh;
+  background: rgba(var(--mantle));
+  padding: 1vh 2vw;
+  font-weight: 400;
+  font-size: 0.8rem;
+}
+
+.sub-section>.header-container>input:focus {
+  flex: 0.3;
+  border: none;
+  border-radius: 100vh;
+  background: rgba(var(--surface0));
+  padding: 1vh 2vw;
 }
 
 .sub-section>h3 {
   position: sticky;
-  top: 4.1rem;
+  top: 3rem;
   left: 1vw;
   z-index: 8;
-  margin: 1vh 0;
   background: rgba(var(--crust));
-  text-align: center;
+  padding-left: 2vw;
+  font-weight: 500;
+  font-size: 1rem;
 }
 
 .list-element {
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 1vw;
-  padding: 1vh 2vw;
+  gap: 0.8vw;
+  padding: 0.5vh 2vw;
+  font-weight: 300;
   font-size: 0.8rem;
 }
 
-.list-element>span:nth-child(1) {
-  border-radius: 1vh;
+.list-element:nth-child(even) {
   background: rgba(var(--mantle));
+}
+
+.list-element>span:nth-child(1) {
   padding: 1vh;
   min-width: 35%;
 }
