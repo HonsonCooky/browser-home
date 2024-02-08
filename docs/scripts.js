@@ -1,4 +1,14 @@
 // -----------------------------------------------------------------------------------------------------------------
+// # FAVICON COLOR SCHEME SWITCHER
+// -----------------------------------------------------------------------------------------------------------------
+const setFavicon = () => {
+  const favicon = document.querySelector('link[rel="icon"]');
+  favicon.href = window.matchMedia("(prefers-color-scheme: dark)").matches
+    ? "./assets/favicon_dark.png"
+    : "./assets/favicon_light.png";
+};
+
+// -----------------------------------------------------------------------------------------------------------------
 // # PAGE INDICATOR BUTTONS
 // -----------------------------------------------------------------------------------------------------------------
 const pages = [
@@ -57,25 +67,33 @@ const vimTitle = "Vim [v]";
 const edgeTitle = "Edge [e]";
 const vimiumTitle = "Vimium [b]";
 
+function scrollToCenter(element) {
+  let elementRect = element.getBoundingClientRect();
+  let absoluteElementTop = elementRect.top + window.pageYOffset;
+  let middle = absoluteElementTop - window.innerHeight / 6;
+  window.scroll({ top: middle, behavior: "smooth" });
+}
+
 function shortcutsPageKeyBindings(event) {
   const vimSubSection = document.getElementById(`${vimTitle}-0`);
   const edgeSubSection = document.getElementById(`${edgeTitle}-0`);
   const vimiumSubSection = document.getElementById(`${vimiumTitle}-0`);
   switch (event.key) {
     case "v":
-      vimSubSection.tabIndex = -1;
-      vimSubSection.focus();
+      scrollToCenter(vimSubSection);
+      vimShortcuts.focus();
       break;
     case "e":
-      edgeSubSection.tabIndex = -1;
-      edgeSubSection.focus();
+      scrollToCenter(edgeSubSection);
+      edgeShortcuts.focus();
       break;
     case "b":
-      vimiumSubSection.tabIndex = -1;
-      vimiumSubSection.focus();
+      scrollToCenter(vimiumSubSection);
+      vimiumShortcuts.focus();
       break;
     case "/":
     case "s":
+      console.log(document.activeElement);
       const input = document.activeElement.querySelector("input");
       if (input) {
         event.preventDefault();
@@ -135,7 +153,12 @@ document.addEventListener("keydown", (event) => {
     case "h":
       toPage(Math.max(0, currentPageIndex() - 1));
       return;
+    case "Escape":
+      document.activeElement.blur();
+      return;
   }
+
+  // Context based events
   pageBasedEvents(event);
 });
 
@@ -149,6 +172,7 @@ function createSearchBox(searchElement) {
   let prevQuery = "";
   const mark = "marked";
   const highlight = "marked-highlight";
+  const error = "error";
 
   function scrollIntoViewIfNeeded(element) {
     element.classList.add(highlight);
@@ -181,6 +205,7 @@ function createSearchBox(searchElement) {
     if (element.classList) {
       element.classList.remove(mark);
       element.classList.remove(highlight);
+      element.classList.remove(error);
     }
 
     if (query.length > 0 && isSubsequence(query, element)) {
@@ -193,11 +218,13 @@ function createSearchBox(searchElement) {
     }
   }
 
-  function findNext() {
+  function findNext(query) {
     if (matches.length > 0) {
       if (currentIndex != -1) matches[currentIndex].classList.remove(highlight);
       currentIndex = (currentIndex + 1) % matches.length;
       scrollIntoViewIfNeeded(matches[currentIndex]);
+    } else if (query.length > 0) {
+      searchBox.classList.add(error);
     }
   }
 
@@ -214,14 +241,14 @@ function createSearchBox(searchElement) {
   searchBox.type = "text";
   searchBox.placeholder = `Search`;
 
-  searchBox.addEventListener("keydown", function (event) {
+  searchBox.addEventListener("keydown", function(event) {
     if (event.key === "Enter") {
       event.preventDefault();
       if (this.value != prevQuery) searchChildren(searchElement, this.value, 0);
       if (event.shiftKey) {
         findPrevious();
       } else {
-        findNext();
+        findNext(this.value);
       }
     } else if (event.key === "Escape") {
       searchBox.blur();
@@ -302,4 +329,5 @@ fetch("./assets/vimium-shortcuts.json")
 // -----------------------------------------------------------------------------------------------------------------
 // # STARTUP
 // -----------------------------------------------------------------------------------------------------------------
+setFavicon();
 toPage();
