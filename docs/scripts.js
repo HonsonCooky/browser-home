@@ -28,8 +28,8 @@ function toPage(pageNum) {
   for (let i = 0; i < pages.length; i++) {
     const page = pages[i].page;
     const btn = pages[i].btn;
-    const highCol = "rgba(var(--lavender), 0.5)";
-    const normCol = "rgba(var(--overlay0), 0.5)";
+    const highCol = "rgba(var(--mauve))";
+    const normCol = "rgba(var(--overlay0))";
 
     if (pageNum === undefined) {
       const pageX = Math.floor(page.getBoundingClientRect().x);
@@ -46,14 +46,14 @@ function toPage(pageNum) {
       continue;
     }
 
-    page.scrollIntoView({ behavior: "smooth" });
+    page.scrollIntoView();
     btn.style.background = highCol;
   }
 }
 
 function currentPageIndex() {
   for (let i = 0; i < pages.length; i++) {
-    if (pages[i].btn.style.background.includes("lavender")) {
+    if (pages[i].btn.style.background.includes("mauve")) {
       return i;
     }
   }
@@ -63,40 +63,38 @@ function currentPageIndex() {
 // # KEYBOARD EVENTS
 // -----------------------------------------------------------------------------------------------------------------
 
-const vimTitle = "Vim [v]";
-const edgeTitle = "Edge [e]";
-const vimiumTitle = "Vimium [b]";
-
 function scrollToCenter(element) {
   let elementRect = element.getBoundingClientRect();
-  let absoluteElementTop = elementRect.top + window.pageYOffset;
+  let absoluteElementTop = elementRect.top + window.scrollY;
   let middle = absoluteElementTop - window.innerHeight / 6;
-  window.scroll({ top: middle, behavior: "smooth" });
+  window.scroll({ top: middle });
+}
+
+function scrollWindowBy(scrollBy) {
+  window.scrollBy(0, scrollBy);
 }
 
 function shortcutsPageKeyBindings(event) {
-  const vimSubSection = document.getElementById(`${vimTitle}-0`);
-  const edgeSubSection = document.getElementById(`${edgeTitle}-0`);
-  const vimiumSubSection = document.getElementById(`${vimiumTitle}-0`);
   switch (event.key) {
     case "v":
-      scrollToCenter(vimSubSection);
-      vimShortcuts.focus();
+      vimShortcuts.tabIndex = -1;
+      vimShortcuts.focus({ preventScroll: true });
+      scrollToCenter(vimShortcuts);
       break;
     case "e":
-      scrollToCenter(edgeSubSection);
-      edgeShortcuts.focus();
+      edgeShortcuts.tabIndex = -1;
+      edgeShortcuts.focus({ preventScroll: true });
+      scrollToCenter(edgeShortcuts);
       break;
     case "b":
-      scrollToCenter(vimiumSubSection);
-      vimiumShortcuts.focus();
+      vimiumShortcuts.tabIndex = -1;
+      vimiumShortcuts.focus({ preventScroll: true });
+      scrollToCenter(vimiumShortcuts);
       break;
     case "/":
     case "s":
-      console.log(document.activeElement);
       const input = document.activeElement.querySelector("input");
       if (input) {
-        event.preventDefault();
         input.focus();
       }
       break;
@@ -104,6 +102,7 @@ function shortcutsPageKeyBindings(event) {
 }
 
 function toolsPageKeyBindings(event) {
+  //TODO
   switch (event.key) {
   }
 }
@@ -119,47 +118,49 @@ function pageBasedEvents(event) {
   }
 }
 
-function scrollActiveElementBy(scrollBy) {
-  document.activeElement.scroll({
-    top: document.activeElement.scrollTop + scrollBy,
-    left: 0,
-    behavior: "smooth",
-  });
-}
-
-function getRem() {
-  return parseFloat(getComputedStyle(document.documentElement).fontSize);
+function generateKeybindActivation(event) {
+  return function(action, ...params) {
+    event.preventDefault();
+    action(...params);
+  };
 }
 
 document.addEventListener("keydown", (event) => {
   if (document.activeElement.id.includes("input")) return;
+  const keybindActivate = generateKeybindActivation(event);
 
   switch (event.key) {
     case "j":
-      scrollActiveElementBy(50);
-      return;
+      keybindActivate(scrollWindowBy, 50);
+      break;
     case "k":
-      scrollActiveElementBy(-50);
-      return;
+      keybindActivate(scrollWindowBy, -50);
+      break;
     case "d":
-      scrollActiveElementBy(document.activeElement.getBoundingClientRect().height - getRem() * 8);
-      return;
+      keybindActivate(scrollWindowBy, window.innerHeight - 300);
+      break;
     case "u":
-      scrollActiveElementBy(-(document.activeElement.getBoundingClientRect().height - getRem() * 8));
-      return;
+      keybindActivate(scrollWindowBy, -(window.innerHeight - 300));
+      break;
+    case "ArrowRight":
     case "l":
-      toPage(Math.min(pages.length - 1, currentPageIndex() + 1));
-      return;
+      const pageNumRight = Math.min(pages.length - 1, currentPageIndex() + 1);
+      keybindActivate(toPage, pageNumRight);
+      break;
+    case "ArrowLeft":
     case "h":
-      toPage(Math.max(0, currentPageIndex() - 1));
-      return;
+      const pageNumLeft = Math.max(0, currentPageIndex() - 1);
+      keybindActivate(toPage, pageNumLeft);
+      break;
     case "Escape":
-      document.activeElement.blur();
-      return;
+      keybindActivate(document.activeElement.blur);
+      break;
+    default:
+      keybindActivate(pageBasedEvents, event);
+      break;
   }
 
   // Context based events
-  pageBasedEvents(event);
 });
 
 // -----------------------------------------------------------------------------------------------------------------
@@ -176,7 +177,7 @@ function createSearchBox(searchElement) {
 
   function scrollIntoViewIfNeeded(element) {
     element.classList.add(highlight);
-    element.scrollIntoView({ block: "center", inline: "nearest", behavior: "smooth" });
+    element.scrollIntoView({ block: "center", inline: "nearest" });
   }
 
   function isSubsequence(query, element) {
@@ -313,6 +314,10 @@ function createShortcut(key, value, level) {
     .forEach((child) => section.appendChild(child));
   return section;
 }
+
+const vimTitle = "Vim";
+const edgeTitle = "Edge";
+const vimiumTitle = "Vimium";
 
 fetch("./assets/vim-shortcuts.json")
   .then((response) => response.json())
