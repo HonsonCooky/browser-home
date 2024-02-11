@@ -1,5 +1,6 @@
 /*FONT: JetBrainsMono*/
 @import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800&display=swap");
+@import url("https://www.nerdfonts.com/assets/css/webfont.css");
 
 /*THEME: Catppuccin*/
 @media (prefers-color-scheme: light) {
@@ -115,7 +116,7 @@ body::-webkit-scrollbar {
   padding: 0.5vh 1vw;
 }
 
-#page-indicator > button {
+#page-indicator>button {
   margin: 0 0.2vw;
   border: none;
   border-radius: 1.2vh;
@@ -144,7 +145,7 @@ body::-webkit-scrollbar {
   height: 100px;
 }
 
-.page-header > h1 {
+.page-header>h1 {
   position: sticky;
   top: 2vh;
   left: 2vw;
@@ -152,7 +153,7 @@ body::-webkit-scrollbar {
   font-size: 40px;
 }
 
-.page-header > span {
+.page-header>span {
   flex: 1;
   font-weight: 200;
   font-size: 15px;
@@ -160,6 +161,8 @@ body::-webkit-scrollbar {
 }
 
 section {
+  display: flex;
+  flex-direction: column;
   margin-bottom: 10vh;
   border: 2px solid rgba(var(--crust));
   border-radius: 2vh;
@@ -171,8 +174,9 @@ section:focus {
 }
 
 .sub-section {
+  display: flex;
   flex: 1;
-  margin-bottom: 10vh;
+  flex-direction: column;
   border: none;
   border-radius: 1vh;
 }
@@ -181,7 +185,7 @@ section:focus {
   display: none;
 }
 
-.sub-section > .header-container {
+.sub-section>.header-container {
   display: flex;
   position: sticky;
   top: 90px;
@@ -190,21 +194,20 @@ section:focus {
   align-items: center;
   gap: 1rem;
   z-index: 10;
-  margin-bottom: 50px;
-  border-bottom: 5px solid rgba(var(--crust));
+  border-bottom: 8px solid rgba(var(--crust), 0.5);
   border-radius: 2vh;
   background: rgba(var(--mantle));
   height: 125px;
 }
 
-.sub-section > .header-container > h2 {
+.sub-section>.header-container>h2 {
   margin: 0;
   padding: 0;
   font-weight: 800;
   font-size: 30px;
 }
 
-.sub-section > .header-container > input {
+.sub-section>.header-container>input {
   border: 2px solid rgba(var(--crust));
   border-radius: 100vh;
   background: rgba(var(--base));
@@ -214,11 +217,11 @@ section:focus {
   font-weight: 200;
 }
 
-.sub-section > .header-container > input::-webkit-input-placeholder {
+.sub-section>.header-container>input::-webkit-input-placeholder {
   color: rgba(var(--text), 0.8);
 }
 
-.sub-section > h3 {
+.sub-section>h3 {
   position: sticky;
   top: 218px;
   z-index: 8;
@@ -234,7 +237,7 @@ section:focus {
   white-space: nowrap;
 }
 
-.sub-section > h4 {
+.sub-section>h4 {
   position: sticky;
   top: calc(248px + 2vh);
   z-index: 7;
@@ -257,10 +260,23 @@ section:focus {
   font-size: 14px;
 }
 
-.list-element > span:nth-child(1) {
+.list-element>span:nth-child(1) {
   min-width: 35%;
 }
 
-.list-element > span:nth-child(2) {
+.list-element>span:nth-child(2) {
   max-width: 70%;
+}
+
+.btn-row {
+  display: flex;
+  flex-direction: row;
+  gap: 0.2vw;
+}
+
+.btn-row>button {
+  flex: 1;
+  border: none;
+  background: rgba(var(--base));
+  font-size: 20px;
 }

@@ -1,3 +1,8 @@
+const vimShortcuts = document.getElementById("vim-shortcuts");
+const edgeShortcuts = document.getElementById("edge-shortcuts");
+const vimiumShortcuts = document.getElementById("vimium-shortcuts");
+const keyboardLayout = document.getElementById("keyboard-layout");
+
 // -----------------------------------------------------------------------------------------------------------------
 // # FAVICON COLOR SCHEME SWITCHER
 // -----------------------------------------------------------------------------------------------------------------
@@ -33,8 +38,10 @@ function toPage(pageNum) {
 
     if (pageNum === undefined) {
       const pageX = Math.floor(page.getBoundingClientRect().x);
+      console.log(i, pageX);
       if (pageX === 0) {
         btn.style.background = highCol;
+        page.scrollIntoView();
       } else {
         btn.style.background = normCol;
       }
@@ -75,35 +82,51 @@ function scrollWindowBy(scrollBy) {
 }
 
 function shortcutsPageKeyBindings(event) {
+  const keybindActivate = generateKeybindActivation(event);
   switch (event.key) {
-    case "v":
-      vimShortcuts.tabIndex = -1;
-      vimShortcuts.focus({ preventScroll: true });
-      scrollToCenter(vimShortcuts);
+    case "V":
+      keybindActivate(function () {
+        vimShortcuts.tabIndex = -1;
+        vimShortcuts.focus({ preventScroll: true });
+        scrollToCenter(vimShortcuts);
+      });
       break;
-    case "e":
-      edgeShortcuts.tabIndex = -1;
-      edgeShortcuts.focus({ preventScroll: true });
-      scrollToCenter(edgeShortcuts);
+    case "E":
+      keybindActivate(function () {
+        edgeShortcuts.tabIndex = -1;
+        edgeShortcuts.focus({ preventScroll: true });
+        scrollToCenter(edgeShortcuts);
+      });
       break;
-    case "b":
-      vimiumShortcuts.tabIndex = -1;
-      vimiumShortcuts.focus({ preventScroll: true });
-      scrollToCenter(vimiumShortcuts);
+    case "B":
+      keybindActivate(function () {
+        vimiumShortcuts.tabIndex = -1;
+        vimiumShortcuts.focus({ preventScroll: true });
+        scrollToCenter(vimiumShortcuts);
+      });
       break;
     case "/":
     case "s":
-      const input = document.activeElement.querySelector("input");
-      if (input) {
-        input.focus();
-      }
+      keybindActivate(function () {
+        const input = document.activeElement.querySelector("input");
+        if (input) {
+          input.focus();
+        }
+      });
       break;
   }
 }
 
 function toolsPageKeyBindings(event) {
-  //TODO
+  const keybindActivate = generateKeybindActivation(event);
   switch (event.key) {
+    case "K":
+      keybindActivate(function () {
+        keyboardLayout.tabIndex = -1;
+        keyboardLayout.focus({ preventScroll: true });
+        scrollToCenter(keyboardLayout);
+      });
+      break;
   }
 }
 
@@ -119,7 +142,7 @@ function pageBasedEvents(event) {
 }
 
 function generateKeybindActivation(event) {
-  return function(action, ...params) {
+  return function (action, ...params) {
     event.preventDefault();
     action(...params);
   };
@@ -153,14 +176,12 @@ document.addEventListener("keydown", (event) => {
       keybindActivate(toPage, pageNumLeft);
       break;
     case "Escape":
-      keybindActivate(document.activeElement.blur);
+      keybindActivate(() => document.activeElement.blur());
       break;
     default:
-      keybindActivate(pageBasedEvents, event);
+      pageBasedEvents(event);
       break;
   }
-
-  // Context based events
 });
 
 // -----------------------------------------------------------------------------------------------------------------
@@ -242,7 +263,7 @@ function createSearchBox(searchElement) {
   searchBox.type = "text";
   searchBox.placeholder = `Search`;
 
-  searchBox.addEventListener("keydown", function(event) {
+  searchBox.addEventListener("keydown", function (event) {
     if (event.key === "Enter") {
       event.preventDefault();
       if (this.value != prevQuery) searchChildren(searchElement, this.value, 0);
@@ -261,9 +282,6 @@ function createSearchBox(searchElement) {
 // -----------------------------------------------------------------------------------------------------------------
 // # SHORTCUT LOADING
 // -----------------------------------------------------------------------------------------------------------------
-const vimShortcuts = document.getElementById("vim-shortcuts");
-const edgeShortcuts = document.getElementById("edge-shortcuts");
-const vimiumShortcuts = document.getElementById("vimium-shortcuts");
 
 function createSubSection(key, level) {
   const div = document.createElement("div");
@@ -315,21 +333,59 @@ function createShortcut(key, value, level) {
   return section;
 }
 
-const vimTitle = "Vim";
-const edgeTitle = "Edge";
-const vimiumTitle = "Vimium";
-
 fetch("./assets/vim-shortcuts.json")
   .then((response) => response.json())
-  .then((data) => vimShortcuts.appendChild(createShortcut(vimTitle, data, 0)));
+  .then((data) => vimShortcuts.appendChild(createShortcut("Vim", data, 0)));
 
 fetch("./assets/edge-shortcuts.json")
   .then((response) => response.json())
-  .then((data) => edgeShortcuts.appendChild(createShortcut(edgeTitle, data, 0)));
+  .then((data) => edgeShortcuts.appendChild(createShortcut("Edge", data, 0)));
 
 fetch("./assets/vimium-shortcuts.json")
   .then((response) => response.json())
-  .then((data) => vimiumShortcuts.appendChild(createShortcut(vimiumTitle, data, 0)));
+  .then((data) => vimiumShortcuts.appendChild(createShortcut("Vimium", data, 0)));
+
+// -----------------------------------------------------------------------------------------------------------------
+// # TOOLS LOADING
+// -----------------------------------------------------------------------------------------------------------------
+
+function createKeyboardLayout(header, data) {
+  const div = document.createElement("div");
+  div.id = `${header}-0`;
+  div.className = "sub-section";
+
+  const headerContainer = document.createElement("div");
+  headerContainer.className = "header-container";
+  const h2 = document.createElement("h2");
+  h2.innerText = header;
+  headerContainer.appendChild(h2);
+
+  const { layers, titles } = data;
+  const { meta, ...content } = layers;
+
+  const [cols, rows] = meta.size.split("x").map(Number);
+
+  // Title Buttons
+  const btnRow = document.createElement("div");
+  btnRow.id = `${header}-btn-row`;
+  btnRow.className = "btn-row";
+  for (let t = 0; t < titles.length; t++) {
+    let title = titles[t];
+    title = `[${title.slice(0, 1)}]${title.slice(1)}`;
+    const btn = document.createElement("button");
+    btn.id = `${title}-btn`;
+    btn.innerText = title;
+    btnRow.appendChild(btn);
+  }
+
+  div.appendChild(headerContainer);
+  div.appendChild(btnRow);
+  return div;
+}
+
+fetch("./assets/keyboard-layout.json")
+  .then((response) => response.json())
+  .then((data) => keyboardLayout.appendChild(createKeyboardLayout("Keyboard Layout", data)));
 
 // -----------------------------------------------------------------------------------------------------------------
 // # STARTUP
