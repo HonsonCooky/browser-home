@@ -38,7 +38,6 @@ function toPage(pageNum) {
 
     if (pageNum === undefined) {
       const pageX = Math.floor(page.getBoundingClientRect().x);
-      console.log(i, pageX);
       if (pageX === 0) {
         btn.style.background = highCol;
         page.scrollIntoView();
@@ -85,21 +84,21 @@ function shortcutsPageKeyBindings(event) {
   const keybindActivate = generateKeybindActivation(event);
   switch (event.key) {
     case "V":
-      keybindActivate(function () {
+      keybindActivate(function() {
         vimShortcuts.tabIndex = -1;
         vimShortcuts.focus({ preventScroll: true });
         scrollToCenter(vimShortcuts);
       });
       break;
     case "E":
-      keybindActivate(function () {
+      keybindActivate(function() {
         edgeShortcuts.tabIndex = -1;
         edgeShortcuts.focus({ preventScroll: true });
         scrollToCenter(edgeShortcuts);
       });
       break;
     case "B":
-      keybindActivate(function () {
+      keybindActivate(function() {
         vimiumShortcuts.tabIndex = -1;
         vimiumShortcuts.focus({ preventScroll: true });
         scrollToCenter(vimiumShortcuts);
@@ -107,7 +106,7 @@ function shortcutsPageKeyBindings(event) {
       break;
     case "/":
     case "s":
-      keybindActivate(function () {
+      keybindActivate(function() {
         const input = document.activeElement.querySelector("input");
         if (input) {
           input.focus();
@@ -117,15 +116,92 @@ function shortcutsPageKeyBindings(event) {
   }
 }
 
+let flatmapCache = [];
+
+function keyboardTesting(event) {
+  const keybindActivate = generateKeybindActivation(event);
+  switch (event.key) {
+    case "Escape":
+      keybindActivate(() => document.activeElement.blur());
+      break;
+    default:
+      console.log(event.key);
+      event.preventDefault();
+      const { meta, ...content } = keyboardData.layers;
+      const [rows, cols] = meta.size.split("x").map(Number);
+      if (flatmapCache.length === 0) {
+        const baseLayer = [];
+        for (let i = 0; i < rows; i++) {
+          for (let j = 0; j < cols; j++) {
+            baseLayer.push(content[i][j][0]);
+          }
+        }
+
+        flatmapCache = baseLayer.map((e) => {
+          switch (e.toLowerCase()) {
+            case "space":
+              return " ";
+            case "||nf-md-backspace||":
+              return "backspace";
+            case "<a>":
+              return "alt";
+            case "<c>":
+              return "control";
+            case "<s>":
+              return "shift";
+            case "||nf-md-arrow_down||":
+              return "arrowdown";
+            case "||nf-md-arrow_up||":
+              return "arrowup";
+            case "os":
+              return "meta";
+            default:
+              return e.toLowerCase();
+          }
+        });
+      }
+      let location = flatmapCache.indexOf(event.key.toLowerCase());
+      if (event.location > 1) {
+        location = flatmapCache.indexOf(event.key.toLowerCase(), location + 1);
+      }
+      if (location === -1) break;
+      document.activeElement.children[location].classList.add("key-highlight");
+      break;
+  }
+}
+
+const activeKeyboard = () => document.activeElement.querySelector('.layout[style*="display: grid"]');
+
 function toolsPageKeyBindings(event) {
   const keybindActivate = generateKeybindActivation(event);
   switch (event.key) {
     case "K":
-      keybindActivate(function () {
-        keyboardLayout.tabIndex = -1;
-        keyboardLayout.focus({ preventScroll: true });
-        scrollToCenter(keyboardLayout);
+      const isSection = document.activeElement != keyboardLayout;
+      const element = isSection ? keyboardLayout : activeKeyboard();
+      if (!element) break;
+      keybindActivate(function() {
+        element.tabIndex = -1;
+        element.focus({ preventScroll: true });
+        if (isSection) scrollToCenter(element);
       });
+      break;
+    case "B":
+      if (document.activeElement === keyboardLayout) btnAllocation[0].click();
+      break;
+    case "L":
+      if (document.activeElement === keyboardLayout) btnAllocation[1].click();
+      break;
+    case "R":
+      if (document.activeElement === keyboardLayout) btnAllocation[2].click();
+      break;
+    case "A":
+      if (document.activeElement === keyboardLayout) btnAllocation[3].click();
+      break;
+    case "M":
+      if (document.activeElement === keyboardLayout) btnAllocation[4].click();
+      break;
+    case "T":
+      if (document.activeElement === keyboardLayout) btnAllocation[5].click();
       break;
   }
 }
@@ -142,14 +218,32 @@ function pageBasedEvents(event) {
 }
 
 function generateKeybindActivation(event) {
-  return function (action, ...params) {
+  return function(action, ...params) {
     event.preventDefault();
     action(...params);
   };
 }
 
+document.addEventListener("keyup", (event) => {
+  if (document.activeElement.classList.contains("layout")) {
+    const children = document.activeElement.children;
+    if (flatmapCache.length === 0) return;
+    let location = flatmapCache.indexOf(event.key.toLowerCase());
+    if (event.location > 1) {
+      location = flatmapCache.indexOf(event.key.toLowerCase(), location + 1);
+    }
+    if (location === -1) return;
+    children[location].classList.remove("key-highlight");
+  }
+});
+
 document.addEventListener("keydown", (event) => {
   if (document.activeElement.id.includes("input")) return;
+  if (document.activeElement.classList.contains("layout")) {
+    keyboardTesting(event);
+    return;
+  }
+
   const keybindActivate = generateKeybindActivation(event);
 
   switch (event.key) {
@@ -167,11 +261,13 @@ document.addEventListener("keydown", (event) => {
       break;
     case "ArrowRight":
     case "l":
+      document.activeElement.blur();
       const pageNumRight = Math.min(pages.length - 1, currentPageIndex() + 1);
       keybindActivate(toPage, pageNumRight);
       break;
     case "ArrowLeft":
     case "h":
+      document.activeElement.blur();
       const pageNumLeft = Math.max(0, currentPageIndex() - 1);
       keybindActivate(toPage, pageNumLeft);
       break;
@@ -263,7 +359,7 @@ function createSearchBox(searchElement) {
   searchBox.type = "text";
   searchBox.placeholder = `Search`;
 
-  searchBox.addEventListener("keydown", function (event) {
+  searchBox.addEventListener("keydown", function(event) {
     if (event.key === "Enter") {
       event.preventDefault();
       if (this.value != prevQuery) searchChildren(searchElement, this.value, 0);
@@ -349,6 +445,7 @@ fetch("./assets/vimium-shortcuts.json")
 // # TOOLS LOADING
 // -----------------------------------------------------------------------------------------------------------------
 
+const btnAllocation = [];
 function createKeyboardLayout(header, data) {
   const div = document.createElement("div");
   div.id = `${header}-0`;
@@ -362,30 +459,100 @@ function createKeyboardLayout(header, data) {
 
   const { layers, titles } = data;
   const { meta, ...content } = layers;
-
-  const [cols, rows] = meta.size.split("x").map(Number);
+  const [rows, cols] = meta.size.split("x").map(Number);
 
   // Title Buttons
   const btnRow = document.createElement("div");
   btnRow.id = `${header}-btn-row`;
   btnRow.className = "btn-row";
+  const divAllocation = [];
   for (let t = 0; t < titles.length; t++) {
+    const btnDefault = "rgba(var(--text))";
+    const btnHighlight = "rgba(var(--green))";
+
     let title = titles[t];
     title = `[${title.slice(0, 1)}]${title.slice(1)}`;
     const btn = document.createElement("button");
     btn.id = `${title}-btn`;
     btn.innerText = title;
+    btn.style.color = t === 0 ? btnHighlight : btnDefault;
     btnRow.appendChild(btn);
+
+    const layout = document.createElement("div");
+    layout.id = `${title}-layout`;
+    layout.className = "layout";
+    layout.style.display = t === 0 ? "grid" : "none";
+    layout.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+    layout.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
+
+    btn.onclick = () => {
+      btnAllocation.forEach((b) => (b.style.color = btnDefault));
+      divAllocation.forEach((d) => (d.style.display = "none"));
+      btn.style.color = btnHighlight;
+      layout.style.display = "grid";
+    };
+
+    btnAllocation.push(btn);
+    divAllocation.push(layout);
+  }
+
+  const layouts = document.createElement("div");
+  layouts.id = "keyboard-layouts";
+  layouts.className = "sub-section";
+  for (let i = 0; i < rows; i++) {
+    for (let j = 0; j < cols; j++) {
+      for (let t = 0; t < titles.length; t++) {
+        const layoutDiv = divAllocation[t];
+        const keyboardBtn = document.createElement("div");
+        let value = content[i][j][t];
+        let color = "rgba(var(--text))";
+        if (value.length === 0) {
+          value = content[i][j][0];
+          color = "rgba(var(--peach), 0.5)";
+        }
+        keyboardBtn.id = `${titles[t]}-${value}`;
+        keyboardBtn.className = "keyboard-btn";
+
+        // Special buttons (shift, control, alt)
+        value = value.replaceAll("<A>", `<span class="special">Alt</span>`);
+        value = value.replaceAll("A-", `<span class="special">A-</span>`);
+        value = value.replaceAll("<C>", `<span class="special">Ctrl</span>`);
+        value = value.replaceAll("C-", `<span class="special">C-</span>`);
+        value = value.replaceAll("<S>", `<span class="special">Shift</span>`);
+        value = value.replaceAll("S-", `<span class="special">S-</span>`);
+
+        // Icons
+        value = value
+          .split("||")
+          .filter((str) => str.length > 0)
+          .map((str) => {
+            if (str.startsWith("nf-")) {
+              return `<i class="nf ${str}" style="color: ${color}"></i>`;
+            }
+            return str;
+          })
+          .join("");
+
+        keyboardBtn.innerHTML = value;
+        keyboardBtn.style.color = color;
+        layoutDiv.appendChild(keyboardBtn);
+      }
+    }
   }
 
   div.appendChild(headerContainer);
   div.appendChild(btnRow);
+  divAllocation.forEach((d) => div.appendChild(d));
   return div;
 }
 
+let keyboardData = {};
 fetch("./assets/keyboard-layout.json")
   .then((response) => response.json())
-  .then((data) => keyboardLayout.appendChild(createKeyboardLayout("Keyboard Layout", data)));
+  .then((data) => {
+    keyboardData = data;
+    keyboardLayout.appendChild(createKeyboardLayout("Keyboard Layout", data));
+  });
 
 // -----------------------------------------------------------------------------------------------------------------
 // # STARTUP

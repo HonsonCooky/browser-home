@@ -119,7 +119,7 @@ body::-webkit-scrollbar {
 #page-indicator>button {
   margin: 0 0.2vw;
   border: none;
-  border-radius: 1.2vh;
+  border-radius: 1vh;
   background: rgba(var(--overlay0));
   padding: 0;
   width: 1.2vh;
@@ -165,11 +165,12 @@ section {
   flex-direction: column;
   margin-bottom: 10vh;
   border: 2px solid rgba(var(--crust));
-  border-radius: 2vh;
+  border-radius: 1vh;
   background: rgba(var(--mantle));
 }
 
-section:focus {
+section:focus,
+.layout:focus {
   border: 2px dotted rgba(var(--blue)) !important;
 }
 
@@ -195,7 +196,7 @@ section:focus {
   gap: 1rem;
   z-index: 10;
   border-bottom: 8px solid rgba(var(--crust), 0.5);
-  border-radius: 2vh;
+  border-radius: 1vh;
   background: rgba(var(--mantle));
   height: 125px;
 }
@@ -272,11 +273,46 @@ section:focus {
   display: flex;
   flex-direction: row;
   gap: 0.2vw;
+  padding: 2vh 2vw;
 }
 
 .btn-row>button {
   flex: 1;
   border: none;
+  border-bottom: 4px solid rgba(var(--crust));
+  border-radius: 1vh;
   background: rgba(var(--base));
+  overflow: hidden;
   font-size: 20px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.layout {
+  grid-gap: 5px;
+  border-radius: 1vh;
+  padding: 2vh 2vw;
+}
+
+.layout>.keyboard-btn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-bottom: 2px solid rgba(var(--crust));
+  border-radius: 1vh;
+  background: rgba(var(--base));
+  padding: 1vh;
+  font-weight: 300;
+  text-align: center;
+  word-break: break-all;
+  overflow-wrap: break-word;
+}
+
+.special {
+  font-style: italic;
+  font-weight: 800;
+}
+
+.key-highlight {
+  background: rgba(var(--yellow), 0.2) !important;
 }
