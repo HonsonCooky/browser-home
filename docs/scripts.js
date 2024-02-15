@@ -73,6 +73,26 @@ function currentPageIndex() {
 }
 
 // -----------------------------------------------------------------------------------------------------------------
+// # PAGE HEADER TRANSITION
+// -----------------------------------------------------------------------------------------------------------------
+
+const scrollThreshold = 100;
+const stickyClass = "sticky";
+const fullscreenClass = "full";
+window.addEventListener("scroll", (e) => {
+  console.log(e);
+  const header = pages[currentPageIndex()].page.querySelector(".page-header");
+  if (header.getAnimations().length > 0) return;
+  if (window.scrollY > scrollThreshold) {
+    header.classList.add(stickyClass);
+    header.classList.remove(fullscreenClass);
+  } else {
+    header.classList.remove(stickyClass);
+    header.classList.add(fullscreenClass);
+  }
+});
+
+// -----------------------------------------------------------------------------------------------------------------
 // # KEYBOARD EVENTS
 // -----------------------------------------------------------------------------------------------------------------
 
