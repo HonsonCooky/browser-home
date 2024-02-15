@@ -13,6 +13,13 @@ const setFavicon = () => {
     : "./assets/HC_LOGO_LIGHT_128x128.png";
 };
 
+const setHomeIcon = () => {
+  const homeIcon = document.getElementById("home-icon");
+  homeIcon.src = window.matchMedia("(prefers-color-scheme: dark)").matches
+    ? "./assets/HC_LOGO_DARK_128x128.png"
+    : "./assets/HC_LOGO_LIGHT_128x128.png";
+};
+
 // -----------------------------------------------------------------------------------------------------------------
 // # PAGE INDICATOR BUTTONS
 // -----------------------------------------------------------------------------------------------------------------
@@ -72,7 +79,7 @@ function currentPageIndex() {
 function scrollToCenter(element) {
   let elementRect = element.getBoundingClientRect();
   let absoluteElementTop = elementRect.top + window.scrollY;
-  let middle = absoluteElementTop - window.innerHeight / 6;
+  let middle = absoluteElementTop - window.innerHeight / 5;
   window.scroll({ top: middle });
 }
 
@@ -125,7 +132,6 @@ function keyboardTesting(event) {
       keybindActivate(() => document.activeElement.blur());
       break;
     default:
-      console.log(event.key);
       event.preventDefault();
       const { meta, ...content } = keyboardData.layers;
       const [rows, cols] = meta.size.split("x").map(Number);
@@ -238,6 +244,8 @@ document.addEventListener("keyup", (event) => {
 });
 
 document.addEventListener("keydown", (event) => {
+  if (event.ctrlKey) return;
+
   if (document.activeElement.id.includes("input")) return;
   if (document.activeElement.classList.contains("layout")) {
     keyboardTesting(event);
@@ -429,13 +437,13 @@ function createShortcut(key, value, level) {
   return section;
 }
 
-fetch("./assets/vim-shortcuts.json")
-  .then((response) => response.json())
-  .then((data) => vimShortcuts.appendChild(createShortcut("Vim", data, 0)));
-
 fetch("./assets/edge-shortcuts.json")
   .then((response) => response.json())
   .then((data) => edgeShortcuts.appendChild(createShortcut("Edge", data, 0)));
+
+fetch("./assets/vim-shortcuts.json")
+  .then((response) => response.json())
+  .then((data) => vimShortcuts.appendChild(createShortcut("Vim", data, 0)));
 
 fetch("./assets/vimium-shortcuts.json")
   .then((response) => response.json())
@@ -560,5 +568,11 @@ fetch("./assets/keyboard-layout.json")
 // -----------------------------------------------------------------------------------------------------------------
 // # STARTUP
 // -----------------------------------------------------------------------------------------------------------------
+window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", ({ matches }) => {
+  setFavicon();
+  setHomeIcon();
+});
+
 setFavicon();
+setHomeIcon();
 toPage();

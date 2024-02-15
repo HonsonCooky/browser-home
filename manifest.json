@@ -2,6 +2,7 @@
   "manifest_version": 3,
   "name": "HonsonCooky Browser Homepage",
   "version": "1.0.0",
+  "description": "A custom homepage for edge that adds tools and helpful information.",
   "chrome_settings_overrides": {
     "homepage": "https://browser.github.honsoncooky.dev",
     "startup_pages": [
