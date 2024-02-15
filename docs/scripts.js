@@ -9,8 +9,8 @@ const keyboardLayout = document.getElementById("keyboard-layout");
 const setFavicon = () => {
   const favicon = document.querySelector('link[rel="icon"]');
   favicon.href = window.matchMedia("(prefers-color-scheme: dark)").matches
-    ? "./assets/favicon_dark.png"
-    : "./assets/favicon_light.png";
+    ? "./assets/HC_LOGO_DARK_128x128.png"
+    : "./assets/HC_LOGO_LIGHT_128x128.png";
 };
 
 // -----------------------------------------------------------------------------------------------------------------
@@ -446,6 +446,8 @@ fetch("./assets/vimium-shortcuts.json")
 // -----------------------------------------------------------------------------------------------------------------
 
 const btnAllocation = [];
+const keyboardMsgs = ["", "[K] Test Keyboard", "[Esc] Exit | Press key (without modifiers) to highlight location"];
+const keyboardMessage = document.createElement("span");
 function createKeyboardLayout(header, data) {
   const div = document.createElement("div");
   div.id = `${header}-0`;
@@ -456,6 +458,7 @@ function createKeyboardLayout(header, data) {
   const h2 = document.createElement("h2");
   h2.innerText = header;
   headerContainer.appendChild(h2);
+  headerContainer.appendChild(keyboardMessage);
 
   const { layers, titles } = data;
   const { meta, ...content } = layers;
