@@ -91,21 +91,21 @@ function shortcutsPageKeyBindings(event) {
   const keybindActivate = generateKeybindActivation(event);
   switch (event.key) {
     case "V":
-      keybindActivate(function() {
+      keybindActivate(function () {
         vimShortcuts.tabIndex = -1;
         vimShortcuts.focus({ preventScroll: true });
         scrollToCenter(vimShortcuts);
       });
       break;
     case "E":
-      keybindActivate(function() {
+      keybindActivate(function () {
         edgeShortcuts.tabIndex = -1;
         edgeShortcuts.focus({ preventScroll: true });
         scrollToCenter(edgeShortcuts);
       });
       break;
     case "B":
-      keybindActivate(function() {
+      keybindActivate(function () {
         vimiumShortcuts.tabIndex = -1;
         vimiumShortcuts.focus({ preventScroll: true });
         scrollToCenter(vimiumShortcuts);
@@ -113,7 +113,7 @@ function shortcutsPageKeyBindings(event) {
       break;
     case "/":
     case "s":
-      keybindActivate(function() {
+      keybindActivate(function () {
         const input = document.activeElement.querySelector("input");
         if (input) {
           input.focus();
@@ -124,11 +124,39 @@ function shortcutsPageKeyBindings(event) {
 }
 
 let flatmapCache = [];
+const keyHighlightClass = "key-highlight";
+
+function keyboardHighlightSingle(event, highlight) {
+  const key = event.key.toLowerCase();
+  let location = flatmapCache.indexOf(key);
+  if (event.location > 1) location = flatmapCache.indexOf(key, location + 1);
+  if (location === -1) return;
+  const element = document.activeElement.children[location];
+  if (highlight) {
+    element.classList.add(keyHighlightClass);
+  } else {
+    element.classList.remove(keyHighlightClass);
+  }
+}
+
+function keyboardHighlightAll(event, highlight) {
+  const key = event.key.toLowerCase();
+  let locations = flatmapCache.map((k, i) => [k, i]).filter((a) => a[0] === key);
+  locations.forEach((a) => {
+    const element = document.activeElement.children[a[1]];
+    if (highlight) {
+      element.classList.add(keyHighlightClass);
+    } else {
+      element.classList.remove(keyHighlightClass);
+    }
+  });
+}
 
 function keyboardTesting(event) {
   const keybindActivate = generateKeybindActivation(event);
   switch (event.key) {
     case "Escape":
+      keyboardMessage.innerText = keyboardMsgs[0];
       keybindActivate(() => document.activeElement.blur());
       break;
     default:
@@ -166,12 +194,14 @@ function keyboardTesting(event) {
           }
         });
       }
-      let location = flatmapCache.indexOf(event.key.toLowerCase());
-      if (event.location > 1) {
-        location = flatmapCache.indexOf(event.key.toLowerCase(), location + 1);
+
+      const key = event.key.toLowerCase();
+      if (key != " ") {
+        keyboardHighlightSingle(event, true);
+      } else {
+        keyboardHighlightAll(event, true);
       }
-      if (location === -1) break;
-      document.activeElement.children[location].classList.add("key-highlight");
+
       break;
   }
 }
@@ -184,8 +214,9 @@ function toolsPageKeyBindings(event) {
     case "K":
       const isSection = document.activeElement != keyboardLayout;
       const element = isSection ? keyboardLayout : activeKeyboard();
+      keyboardMessage.innerText = isSection ? keyboardMsgs[1] : keyboardMsgs[2];
       if (!element) break;
-      keybindActivate(function() {
+      keybindActivate(function () {
         element.tabIndex = -1;
         element.focus({ preventScroll: true });
         if (isSection) scrollToCenter(element);
@@ -224,7 +255,7 @@ function pageBasedEvents(event) {
 }
 
 function generateKeybindActivation(event) {
-  return function(action, ...params) {
+  return function (action, ...params) {
     event.preventDefault();
     action(...params);
   };
@@ -232,25 +263,22 @@ function generateKeybindActivation(event) {
 
 document.addEventListener("keyup", (event) => {
   if (document.activeElement.classList.contains("layout")) {
-    const children = document.activeElement.children;
-    if (flatmapCache.length === 0) return;
-    let location = flatmapCache.indexOf(event.key.toLowerCase());
-    if (event.location > 1) {
-      location = flatmapCache.indexOf(event.key.toLowerCase(), location + 1);
+    const key = event.key.toLowerCase();
+    if (key != " ") {
+      keyboardHighlightSingle(event, false);
+    } else {
+      keyboardHighlightAll(event, false);
     }
-    if (location === -1) return;
-    children[location].classList.remove("key-highlight");
   }
 });
 
 document.addEventListener("keydown", (event) => {
-  if (event.ctrlKey) return;
-
   if (document.activeElement.id.includes("input")) return;
   if (document.activeElement.classList.contains("layout")) {
     keyboardTesting(event);
     return;
   }
+  if (event.ctrlKey) return;
 
   const keybindActivate = generateKeybindActivation(event);
 
@@ -280,6 +308,7 @@ document.addEventListener("keydown", (event) => {
       keybindActivate(toPage, pageNumLeft);
       break;
     case "Escape":
+      keyboardMessage.innerText = keyboardMsgs[0];
       keybindActivate(() => document.activeElement.blur());
       break;
     default:
@@ -367,7 +396,7 @@ function createSearchBox(searchElement) {
   searchBox.type = "text";
   searchBox.placeholder = `Search`;
 
-  searchBox.addEventListener("keydown", function(event) {
+  searchBox.addEventListener("keydown", function (event) {
     if (event.key === "Enter") {
       event.preventDefault();
       if (this.value != prevQuery) searchChildren(searchElement, this.value, 0);
@@ -450,7 +479,7 @@ fetch("./assets/vimium-shortcuts.json")
   .then((data) => vimiumShortcuts.appendChild(createShortcut("Vimium", data, 0)));
 
 // -----------------------------------------------------------------------------------------------------------------
-// # TOOLS LOADING
+// # TOOLS LOADING: Keyboard Layout
 // -----------------------------------------------------------------------------------------------------------------
 
 const btnAllocation = [];
@@ -465,6 +494,7 @@ function createKeyboardLayout(header, data) {
   headerContainer.className = "header-container";
   const h2 = document.createElement("h2");
   h2.innerText = header;
+  keyboardMessage.innerText = keyboardMsgs[0];
   headerContainer.appendChild(h2);
   headerContainer.appendChild(keyboardMessage);
 
@@ -566,12 +596,31 @@ fetch("./assets/keyboard-layout.json")
   });
 
 // -----------------------------------------------------------------------------------------------------------------
+// # TOOLS LOADING : TODO LIST
+// -----------------------------------------------------------------------------------------------------------------
+
+const todoListIdSuffix = "-todo-list";
+
+function loadToDoLists() {
+  Object.entries(localStorage).filter(([key, value]) => key.includes(todoListIdSuffix));
+}
+
+function createToDoList(uniqueTitle) {
+  let check = localStorage.getItem(uniqueTitle);
+  if (check) throw Error("This list already exists");
+  localStorage.setItem(`${uniqueTitle}${todoListIdSuffix}`, { hello: "world" });
+}
+
+// -----------------------------------------------------------------------------------------------------------------
 // # STARTUP
 // -----------------------------------------------------------------------------------------------------------------
 window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", ({ matches }) => {
   setFavicon();
   setHomeIcon();
 });
+
+createToDoList("b");
+loadToDoLists();
 
 setFavicon();
 setHomeIcon();
