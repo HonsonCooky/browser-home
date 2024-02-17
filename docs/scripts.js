@@ -84,16 +84,27 @@ function scrollToCenter(element) {
   let elementRect = element.getBoundingClientRect();
   let absoluteElementTop = elementRect.top + window.scrollY;
   let middle = absoluteElementTop - window.innerHeight / 5;
-  console.log(middle, elementRect, absoluteElementTop);
-  window.scrollTo({ top: middle });
+  let header = currentPageHeader();
+  if (header.classList.contains(fullscreenClass)) {
+    window.scrollTo({ top: 1 });
+    setTimeout(() => scrollToCenter(element), 600);
+  } else {
+    window.scrollTo({ top: middle });
+  }
 }
 
-let scrollPosition = 0;
+let scrollXPosition = 0;
+let scrollYPosition = 0;
 let isScrollDown;
 window.onscroll = (event) => {
-  console.log("scroll");
-  isScrollDown = document.body.getBoundingClientRect().top > scrollPosition ? false : true;
-  scrollPosition = document.body.getBoundingClientRect().top;
+  const rect = document.body.getBoundingClientRect();
+  isScrollHorizontal = rect.x != scrollXPosition;
+  scrollXPosition = rect.x;
+
+  if (isScrollHorizontal) return;
+
+  isScrollDown = rect.top > scrollYPosition ? false : true;
+  scrollYPosition = rect.top;
 
   const header = currentPageHeader();
   if (header.getAnimations().length > 0) return;
@@ -103,7 +114,12 @@ window.onscroll = (event) => {
       header.classList.add(stickyClass);
       header.classList.remove(fullscreenClass);
     }, 0);
-  } else if (!isScrollDown && window.scrollY === 0 && header.classList.contains(stickyClass)) {
+  } else if (
+    !isScrollDown &&
+    window.scrollY === 0 &&
+    header.classList.contains(stickyClass) &&
+    document.activeElement.id === ""
+  ) {
     setTimeout(() => {
       header.classList.add(fullscreenClass);
       header.classList.remove(stickyClass);
@@ -116,24 +132,24 @@ window.onscroll = (event) => {
 // -----------------------------------------------------------------------------------------------------------------
 
 function shortcutsPageKeyBindings(event) {
-  const keybindActivate = generateKeybindActivation(event);
+  const controlledActivate = preventDefaultAction(event);
   switch (event.key) {
     case "V":
-      keybindActivate(function () {
+      controlledActivate(function () {
         vimShortcuts.tabIndex = -1;
         vimShortcuts.focus({ preventScroll: true });
         scrollToCenter(vimShortcuts);
       });
       break;
     case "E":
-      keybindActivate(function () {
+      controlledActivate(function () {
         edgeShortcuts.tabIndex = -1;
         edgeShortcuts.focus({ preventScroll: true });
         scrollToCenter(edgeShortcuts);
       });
       break;
     case "B":
-      keybindActivate(function () {
+      controlledActivate(function () {
         vimiumShortcuts.tabIndex = -1;
         vimiumShortcuts.focus({ preventScroll: true });
         scrollToCenter(vimiumShortcuts);
@@ -141,7 +157,7 @@ function shortcutsPageKeyBindings(event) {
       break;
     case "/":
     case "s":
-      keybindActivate(function () {
+      controlledActivate(function () {
         const input = document.activeElement.querySelector("input");
         if (input) {
           input.focus();
@@ -181,11 +197,11 @@ function keyboardHighlightAll(event, highlight) {
 }
 
 function keyboardTesting(event) {
-  const keybindActivate = generateKeybindActivation(event);
+  const controlledActivate = preventDefaultAction(event);
   switch (event.key) {
     case "Escape":
       keyboardMessage.innerText = keyboardMsgs[0];
-      keybindActivate(() => document.activeElement.blur());
+      controlledActivate(() => document.activeElement.blur());
       break;
     default:
       event.preventDefault();
@@ -237,14 +253,14 @@ function keyboardTesting(event) {
 const activeKeyboard = () => document.activeElement.querySelector('.layout[style*="display: grid"]');
 
 function toolsPageKeyBindings(event) {
-  const keybindActivate = generateKeybindActivation(event);
+  const controlledActivate = preventDefaultAction(event);
   switch (event.key) {
     case "K":
       const isSection = document.activeElement != keyboardLayout;
       const element = isSection ? keyboardLayout : activeKeyboard();
       keyboardMessage.innerText = isSection ? keyboardMsgs[1] : keyboardMsgs[2];
       if (!element) break;
-      keybindActivate(function () {
+      controlledActivate(function () {
         element.tabIndex = -1;
         element.focus({ preventScroll: true });
         if (isSection) scrollToCenter(element);
@@ -282,7 +298,7 @@ function pageBasedEvents(event) {
   }
 }
 
-function generateKeybindActivation(event) {
+function preventDefaultAction(event) {
   return function (action, ...params) {
     event.preventDefault();
     action(...params);
@@ -300,6 +316,16 @@ document.addEventListener("keyup", (event) => {
   }
 });
 
+function forceUp() {
+  if (window.scrollY === 0) {
+    document.activeElement.blur();
+    const header = currentPageHeader();
+    if (header.getAnimations().length > 0) return;
+    header.classList.add(fullscreenClass);
+    header.classList.remove(stickyClass);
+  }
+}
+
 document.addEventListener("keydown", (event) => {
   if (document.activeElement.id.includes("input")) return;
   if (document.activeElement.classList.contains("layout")) {
@@ -308,36 +334,42 @@ document.addEventListener("keydown", (event) => {
   }
   if (event.ctrlKey) return;
 
-  const keybindActivate = generateKeybindActivation(event);
+  const controlledActivate = preventDefaultAction(event);
 
   switch (event.key) {
+    case "ArrowDown":
     case "j":
-      keybindActivate(window.scrollBy, 0, 50);
+      controlledActivate(window.scrollBy, 0, 50);
       break;
+    case "ArrowUp":
     case "k":
-      keybindActivate(window.scrollBy, 0, -50);
+      controlledActivate(window.scrollBy, 0, -50);
+      forceUp();
       break;
+    case "PageDown":
     case "d":
-      keybindActivate(window.scrollBy, 0, window.innerHeight - 300);
+      controlledActivate(window.scrollBy, 0, window.innerHeight - 300);
       break;
+    case "PageUp":
     case "u":
-      keybindActivate(window.scrollBy, 0, -(window.innerHeight - 300));
+      controlledActivate(window.scrollBy, 0, -(window.innerHeight - 300));
+      forceUp();
       break;
     case "ArrowRight":
     case "l":
       document.activeElement.blur();
       const pageNumRight = Math.min(pages.length - 1, currentPageIndex() + 1);
-      keybindActivate(toPage, pageNumRight);
+      controlledActivate(toPage, pageNumRight);
       break;
     case "ArrowLeft":
     case "h":
       document.activeElement.blur();
       const pageNumLeft = Math.max(0, currentPageIndex() - 1);
-      keybindActivate(toPage, pageNumLeft);
+      controlledActivate(toPage, pageNumLeft);
       break;
     case "Escape":
       keyboardMessage.innerText = keyboardMsgs[0];
-      keybindActivate(() => document.activeElement.blur());
+      controlledActivate(() => document.activeElement.blur());
       break;
     default:
       pageBasedEvents(event);
