@@ -70,42 +70,50 @@ function currentPageIndex() {
       return i;
     }
   }
+  return 0;
 }
 
 // -----------------------------------------------------------------------------------------------------------------
-// # PAGE HEADER TRANSITION
+// # SCROLLING ACTIONS
 // -----------------------------------------------------------------------------------------------------------------
-
-const scrollThreshold = 100;
 const stickyClass = "sticky";
 const fullscreenClass = "full";
-window.addEventListener("scroll", (e) => {
-  console.log(e);
-  const header = pages[currentPageIndex()].page.querySelector(".page-header");
-  if (header.getAnimations().length > 0) return;
-  if (window.scrollY > scrollThreshold) {
-    header.classList.add(stickyClass);
-    header.classList.remove(fullscreenClass);
-  } else {
-    header.classList.remove(stickyClass);
-    header.classList.add(fullscreenClass);
-  }
-});
-
-// -----------------------------------------------------------------------------------------------------------------
-// # KEYBOARD EVENTS
-// -----------------------------------------------------------------------------------------------------------------
+const currentPageHeader = () => pages[currentPageIndex()].page.querySelector(".page-header");
 
 function scrollToCenter(element) {
   let elementRect = element.getBoundingClientRect();
   let absoluteElementTop = elementRect.top + window.scrollY;
   let middle = absoluteElementTop - window.innerHeight / 5;
-  window.scroll({ top: middle });
+  console.log(middle, elementRect, absoluteElementTop);
+  window.scrollTo({ top: middle });
 }
 
-function scrollWindowBy(scrollBy) {
-  window.scrollBy(0, scrollBy);
-}
+let scrollPosition = 0;
+let isScrollDown;
+window.onscroll = (event) => {
+  console.log("scroll");
+  isScrollDown = document.body.getBoundingClientRect().top > scrollPosition ? false : true;
+  scrollPosition = document.body.getBoundingClientRect().top;
+
+  const header = currentPageHeader();
+  if (header.getAnimations().length > 0) return;
+
+  if (isScrollDown && header.classList.contains(fullscreenClass)) {
+    setTimeout(() => {
+      header.classList.add(stickyClass);
+      header.classList.remove(fullscreenClass);
+    }, 0);
+  } else if (!isScrollDown && window.scrollY === 0 && header.classList.contains(stickyClass)) {
+    setTimeout(() => {
+      header.classList.add(fullscreenClass);
+      header.classList.remove(stickyClass);
+    }, 0);
+  }
+};
+
+// -----------------------------------------------------------------------------------------------------------------
+// # KEYBOARD EVENTS
+// -----------------------------------------------------------------------------------------------------------------
 
 function shortcutsPageKeyBindings(event) {
   const keybindActivate = generateKeybindActivation(event);
@@ -304,16 +312,16 @@ document.addEventListener("keydown", (event) => {
 
   switch (event.key) {
     case "j":
-      keybindActivate(scrollWindowBy, 50);
+      keybindActivate(window.scrollBy, 0, 50);
       break;
     case "k":
-      keybindActivate(scrollWindowBy, -50);
+      keybindActivate(window.scrollBy, 0, -50);
       break;
     case "d":
-      keybindActivate(scrollWindowBy, window.innerHeight - 300);
+      keybindActivate(window.scrollBy, 0, window.innerHeight - 300);
       break;
     case "u":
-      keybindActivate(scrollWindowBy, -(window.innerHeight - 300));
+      keybindActivate(window.scrollBy, 0, -(window.innerHeight - 300));
       break;
     case "ArrowRight":
     case "l":
@@ -634,6 +642,7 @@ function createToDoList(uniqueTitle) {
 // -----------------------------------------------------------------------------------------------------------------
 // # STARTUP
 // -----------------------------------------------------------------------------------------------------------------
+window.scrollTo(0, 0);
 window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", ({ matches }) => {
   setFavicon();
   setHomeIcon();
