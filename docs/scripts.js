@@ -32,6 +32,7 @@ function toPage(pageNum) {
       continue;
     }
 
+    window.scrollTo({ top: 0 });
     page.scrollIntoView();
     btn.style.background = highCol;
   }
@@ -171,7 +172,6 @@ function keyboardHighlightAll(event, highlight) {
 }
 
 function keyboardTesting(event) {
-  const controlledActivate = preventDefaultAction(event);
   switch (event.key) {
     case "Escape":
       keyboardMessage.innerText = keyboardMsgs[1];
@@ -318,7 +318,11 @@ function forceUp() {
 function horizontalMove(goLeft, controlledActivate) {
   document.activeElement.blur();
   const pageIndex = currentPageIndex();
-  const pageNum = goLeft ? Math.max(0, pageIndex - 1) : Math.min(pages.length - 1, pageIndex + 1);
+  const pageNum = goLeft ? pageIndex - 1 : pageIndex + 1;
+  if (pageNum < 0 || pageNum >= pages.length) {
+    window.scrollTo({ top: 0 });
+    return;
+  }
   controlledActivate(toPage, pageNum);
 }
 

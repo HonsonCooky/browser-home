@@ -150,7 +150,6 @@ body::-webkit-scrollbar {
   justify-content: center;
   align-items: center;
   transition: height 0.5s ease;
-  width: 100vw;
   height: 100vh;
 }
 
