@@ -13,6 +13,6 @@
     "newtab": "./docs/index.html"
   },
   "icons": {
-    "128": "./docs/assets/HC_LOGO_DARK_128x128.png"
+    "128": "./docs/assets/HC_LOGO_LIGHT_128x128.png"
   }
 }

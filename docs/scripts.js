@@ -1,24 +1,7 @@
 const vimShortcuts = document.getElementById("vim-shortcuts");
 const edgeShortcuts = document.getElementById("edge-shortcuts");
 const vimiumShortcuts = document.getElementById("vimium-shortcuts");
-const keyboardLayout = document.getElementById("keyboard-layout");
-
-// -----------------------------------------------------------------------------------------------------------------
-// # FAVICON COLOR SCHEME SWITCHER
-// -----------------------------------------------------------------------------------------------------------------
-const setFavicon = () => {
-  const favicon = document.querySelector('link[rel="icon"]');
-  favicon.href = window.matchMedia("(prefers-color-scheme: dark)").matches
-    ? "./assets/HC_LOGO_DARK_128x128.png"
-    : "./assets/HC_LOGO_LIGHT_128x128.png";
-};
-
-const setHomeIcon = () => {
-  const homeIcon = document.getElementById("home-icon");
-  homeIcon.src = window.matchMedia("(prefers-color-scheme: dark)").matches
-    ? "./assets/HC_LOGO_DARK_128x128.png"
-    : "./assets/HC_LOGO_LIGHT_128x128.png";
-};
+const keyboardSection = document.getElementById("keyboard-layout");
 
 // -----------------------------------------------------------------------------------------------------------------
 // # PAGE INDICATOR BUTTONS
@@ -36,23 +19,13 @@ const pages = [
 
 function toPage(pageNum) {
   if (document.activeElement.tagName.toLowerCase() === "input") return;
+  if (!pageNum) pageNum = 0;
 
   for (let i = 0; i < pages.length; i++) {
     const page = pages[i].page;
     const btn = pages[i].btn;
     const highCol = "rgba(var(--mauve))";
     const normCol = "rgba(var(--overlay0))";
-
-    if (pageNum === undefined) {
-      const pageX = Math.floor(page.getBoundingClientRect().x);
-      if (pageX === 0) {
-        btn.style.background = highCol;
-        page.scrollIntoView();
-      } else {
-        btn.style.background = normCol;
-      }
-      continue;
-    }
 
     if (i != pageNum) {
       btn.style.background = normCol;
@@ -96,7 +69,7 @@ function scrollToCenter(element) {
 let scrollXPosition = 0;
 let scrollYPosition = 0;
 let isScrollDown;
-window.onscroll = (event) => {
+window.onscroll = () => {
   const rect = document.body.getBoundingClientRect();
   isScrollHorizontal = rect.x != scrollXPosition;
   scrollXPosition = rect.x;
@@ -109,17 +82,18 @@ window.onscroll = (event) => {
   const header = currentPageHeader();
   if (header.getAnimations().length > 0) return;
 
-  if (isScrollDown && header.classList.contains(fullscreenClass)) {
+  const toSticky = isScrollDown && header.classList.contains(fullscreenClass);
+  const toFull = !toSticky && window.scrollY === 0 && document.activeElement.id === "";
+
+  if (toSticky) {
     setTimeout(() => {
       header.classList.add(stickyClass);
       header.classList.remove(fullscreenClass);
     }, 0);
-  } else if (
-    !isScrollDown &&
-    window.scrollY === 0 &&
-    header.classList.contains(stickyClass) &&
-    document.activeElement.id === ""
-  ) {
+    return;
+  }
+
+  if (toFull) {
     setTimeout(() => {
       header.classList.add(fullscreenClass);
       header.classList.remove(stickyClass);
@@ -135,21 +109,21 @@ function shortcutsPageKeyBindings(event) {
   const controlledActivate = preventDefaultAction(event);
   switch (event.key) {
     case "V":
-      controlledActivate(function () {
+      controlledActivate(function() {
         vimShortcuts.tabIndex = -1;
         vimShortcuts.focus({ preventScroll: true });
         scrollToCenter(vimShortcuts);
       });
       break;
     case "E":
-      controlledActivate(function () {
+      controlledActivate(function() {
         edgeShortcuts.tabIndex = -1;
         edgeShortcuts.focus({ preventScroll: true });
         scrollToCenter(edgeShortcuts);
       });
       break;
     case "B":
-      controlledActivate(function () {
+      controlledActivate(function() {
         vimiumShortcuts.tabIndex = -1;
         vimiumShortcuts.focus({ preventScroll: true });
         scrollToCenter(vimiumShortcuts);
@@ -157,7 +131,7 @@ function shortcutsPageKeyBindings(event) {
       break;
     case "/":
     case "s":
-      controlledActivate(function () {
+      controlledActivate(function() {
         const input = document.activeElement.querySelector("input");
         if (input) {
           input.focus();
@@ -200,8 +174,10 @@ function keyboardTesting(event) {
   const controlledActivate = preventDefaultAction(event);
   switch (event.key) {
     case "Escape":
-      keyboardMessage.innerText = keyboardMsgs[0];
-      controlledActivate(() => document.activeElement.blur());
+      keyboardMessage.innerText = keyboardMsgs[1];
+      keyboardSection.tabIndex = -1;
+      keyboardSection.focus({ preventScroll: true });
+      scrollToCenter(keyboardSection);
       break;
     default:
       event.preventDefault();
@@ -252,38 +228,51 @@ function keyboardTesting(event) {
 
 const activeKeyboard = () => document.activeElement.querySelector('.layout[style*="display: grid"]');
 
+function keyboardToolKeyBindings(event) {
+  switch (event.key) {
+    case "0":
+    case "B":
+      btnAllocation[0].click();
+      break;
+    case "1":
+    case "L":
+      btnAllocation[1].click();
+      break;
+    case "2":
+    case "R":
+      btnAllocation[2].click();
+      break;
+    case "3":
+    case "A":
+      btnAllocation[3].click();
+      break;
+    case "4":
+    case "M":
+      btnAllocation[4].click();
+      break;
+    case "5":
+    case "T":
+      btnAllocation[5].click();
+      break;
+  }
+}
+
 function toolsPageKeyBindings(event) {
   const controlledActivate = preventDefaultAction(event);
   switch (event.key) {
     case "K":
-      const isSection = document.activeElement != keyboardLayout;
-      const element = isSection ? keyboardLayout : activeKeyboard();
+      const isSection = document.activeElement != keyboardSection;
+      const element = isSection ? keyboardSection : activeKeyboard();
       keyboardMessage.innerText = isSection ? keyboardMsgs[1] : keyboardMsgs[2];
       if (!element) break;
-      controlledActivate(function () {
+      controlledActivate(function() {
         element.tabIndex = -1;
         element.focus({ preventScroll: true });
         if (isSection) scrollToCenter(element);
       });
       break;
-    case "B":
-      if (document.activeElement === keyboardLayout) btnAllocation[0].click();
-      break;
-    case "L":
-      if (document.activeElement === keyboardLayout) btnAllocation[1].click();
-      break;
-    case "R":
-      if (document.activeElement === keyboardLayout) btnAllocation[2].click();
-      break;
-    case "A":
-      if (document.activeElement === keyboardLayout) btnAllocation[3].click();
-      break;
-    case "M":
-      if (document.activeElement === keyboardLayout) btnAllocation[4].click();
-      break;
-    case "T":
-      if (document.activeElement === keyboardLayout) btnAllocation[5].click();
-      break;
+    default:
+      if (document.activeElement === keyboardSection) keyboardToolKeyBindings(event);
   }
 }
 
@@ -299,7 +288,7 @@ function pageBasedEvents(event) {
 }
 
 function preventDefaultAction(event) {
-  return function (action, ...params) {
+  return function(action, ...params) {
     event.preventDefault();
     action(...params);
   };
@@ -326,12 +315,23 @@ function forceUp() {
   }
 }
 
+function horizontalMove(goLeft, controlledActivate) {
+  document.activeElement.blur();
+  const pageIndex = currentPageIndex();
+  const pageNum = goLeft ? Math.max(0, pageIndex - 1) : Math.min(pages.length - 1, pageIndex + 1);
+  controlledActivate(toPage, pageNum);
+}
+
 document.addEventListener("keydown", (event) => {
+  // Search Box
   if (document.activeElement.id.includes("input")) return;
+
+  // Keyboard Testing
   if (document.activeElement.classList.contains("layout")) {
     keyboardTesting(event);
     return;
   }
+
   if (event.ctrlKey) return;
 
   const controlledActivate = preventDefaultAction(event);
@@ -357,15 +357,11 @@ document.addEventListener("keydown", (event) => {
       break;
     case "ArrowRight":
     case "l":
-      document.activeElement.blur();
-      const pageNumRight = Math.min(pages.length - 1, currentPageIndex() + 1);
-      controlledActivate(toPage, pageNumRight);
+      horizontalMove(false, controlledActivate);
       break;
     case "ArrowLeft":
     case "h":
-      document.activeElement.blur();
-      const pageNumLeft = Math.max(0, currentPageIndex() - 1);
-      controlledActivate(toPage, pageNumLeft);
+      horizontalMove(true, controlledActivate);
       break;
     case "Escape":
       keyboardMessage.innerText = keyboardMsgs[0];
@@ -456,7 +452,7 @@ function createSearchBox(searchElement) {
   searchBox.type = "text";
   searchBox.placeholder = `Search`;
 
-  searchBox.addEventListener("keydown", function (event) {
+  searchBox.addEventListener("keydown", function(event) {
     if (event.key === "Enter") {
       event.preventDefault();
       if (this.value != prevQuery) searchChildren(searchElement, this.value, 0);
@@ -652,7 +648,7 @@ fetch("./assets/keyboard-layout.json")
   .then((response) => response.json())
   .then((data) => {
     keyboardData = data;
-    keyboardLayout.appendChild(createKeyboardLayout("Keyboard Layout", data));
+    keyboardSection.appendChild(createKeyboardLayout("Keyboard Layout", data));
   });
 
 // -----------------------------------------------------------------------------------------------------------------
@@ -683,6 +679,4 @@ window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", ({ 
 createToDoList("b");
 loadToDoLists();
 
-setFavicon();
-setHomeIcon();
-toPage();
+toPage(0);
