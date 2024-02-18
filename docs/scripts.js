@@ -2,6 +2,8 @@ const vimShortcuts = document.getElementById("vim-shortcuts");
 const edgeShortcuts = document.getElementById("edge-shortcuts");
 const vimiumShortcuts = document.getElementById("vimium-shortcuts");
 const keyboardSection = document.getElementById("keyboard-layout");
+const todoSection = document.getElementById("to-do-list");
+const canvasSection = document.getElementById("canvas");
 
 // -----------------------------------------------------------------------------------------------------------------
 // # PAGE INDICATOR BUTTONS
@@ -139,6 +141,7 @@ function shortcutsPageKeyBindings(event) {
     case "/":
     case "s":
       controlledActivate(function() {
+        if (document.activeElement.id === "") return;
         const input = document.activeElement.querySelector("input");
         if (input) {
           input.focus();
@@ -238,30 +241,32 @@ function keyboardToolKeyBindings(event) {
   switch (event.key) {
     case "0":
     case "B":
-      btnAllocation[0].click();
+      keyboardLayers[0].click();
       break;
     case "1":
     case "L":
-      btnAllocation[1].click();
+      keyboardLayers[1].click();
       break;
     case "2":
     case "R":
-      btnAllocation[2].click();
+      keyboardLayers[2].click();
       break;
     case "3":
     case "A":
-      btnAllocation[3].click();
+      keyboardLayers[3].click();
       break;
     case "4":
     case "M":
-      btnAllocation[4].click();
+      keyboardLayers[4].click();
       break;
     case "5":
     case "T":
-      btnAllocation[5].click();
+      keyboardLayers[5].click();
       break;
   }
 }
+
+function todoToolKeyBindings() { }
 
 function toolsPageKeyBindings(event) {
   const controlledActivate = preventDefaultAction(event);
@@ -276,6 +281,16 @@ function toolsPageKeyBindings(event) {
         element.focus({ preventScroll: true });
         if (isSection) scrollToCenter(element);
       });
+      break;
+    case "T":
+      todoSection.tabIndex = -1;
+      todoSection.focus({ preventScroll: true });
+      scrollToCenter(todoSection);
+      break;
+    case "C":
+      canvasSection.tabIndex = -1;
+      canvasSection.focus({ preventScroll: true });
+      scrollToCenter(canvasSection);
       break;
     default:
       if (document.activeElement === keyboardSection) keyboardToolKeyBindings(event);
@@ -544,7 +559,7 @@ fetch("./assets/vimium-shortcuts.json")
 // # TOOLS LOADING: Keyboard Layout
 // -----------------------------------------------------------------------------------------------------------------
 
-const btnAllocation = [];
+const keyboardLayers = [];
 const keyboardMsgs = ["", "[K] Test Keyboard", "[Esc] Exit | Press key (without modifiers) to highlight location"];
 const keyboardMessage = document.createElement("span");
 function createKeyboardLayout(header, data) {
@@ -589,13 +604,13 @@ function createKeyboardLayout(header, data) {
     layout.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
 
     btn.onclick = () => {
-      btnAllocation.forEach((b) => (b.style.color = btnDefault));
+      keyboardLayers.forEach((b) => (b.style.color = btnDefault));
       divAllocation.forEach((d) => (d.style.display = "none"));
       btn.style.color = btnHighlight;
       layout.style.display = "grid";
     };
 
-    btnAllocation.push(btn);
+    keyboardLayers.push(btn);
     divAllocation.push(layout);
   }
 
@@ -663,8 +678,55 @@ fetch("./assets/keyboard-layout.json")
 
 const todoListIdSuffix = "-todo-list";
 
+const todoLists = [];
 function loadToDoLists() {
-  Object.entries(localStorage).filter(([key, value]) => key.includes(todoListIdSuffix));
+  const header = "To Dos";
+  const div = document.createElement("div");
+  div.id = `${header}-0`;
+  div.className = "sub-section";
+
+  const headerContainer = document.createElement("div");
+  headerContainer.className = "header-container";
+  const h2 = document.createElement("h2");
+  h2.innerText = header;
+  headerContainer.appendChild(h2);
+
+  const entries = Object.entries(localStorage).filter(([key, value]) => key.includes(todoListIdSuffix));
+
+  const btnRow = document.createElement("div");
+  btnRow.id = `${header}-btn-row`;
+  btnRow.className = "btn-row";
+  const divAllocation = [];
+  for (let e = 0; e < entries.length; e++) {
+    const btnDefault = "rgba(var(--text))";
+    const btnHighlight = "rgba(var(--green))";
+
+    let title = `[${String.fromCharCode(e + 65)}] ${entries[e][0].replace("-todo-list", "")}`;
+    const btn = document.createElement("button");
+    btn.id = `${title}-btn`;
+    btn.innerText = title;
+    btn.style.color = e === 0 ? btnHighlight : btnDefault;
+    btnRow.appendChild(btn);
+
+    const list = document.createElement("div");
+    list.id = `${title}-list`;
+    list.className = "list";
+
+    btn.onclick = () => {
+      todoLists.forEach((b) => (b.style.color = btnDefault));
+      divAllocation.forEach((d) => (d.style.display = "none"));
+      btn.style.color = btnHighlight;
+      list.style.display = "flex";
+    };
+
+    keyboardLayers.push(btn);
+    divAllocation.push(list);
+  }
+
+  div.appendChild(headerContainer);
+  div.appendChild(btnRow);
+  divAllocation.forEach((d) => div.appendChild(d));
+  todoSection.appendChild(div);
 }
 
 function createToDoList(uniqueTitle) {
@@ -682,7 +744,5 @@ window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", ({ 
   setHomeIcon();
 });
 
-createToDoList("b");
 loadToDoLists();
-
 toPage(0);
