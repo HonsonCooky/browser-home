@@ -32,8 +32,13 @@ function toPage(pageNum) {
       continue;
     }
 
-    window.scrollTo({ top: 0 });
+    const header = page.querySelector(".page-header");
+    header.classList.remove(stickyClass);
+    header.classList.add(fullscreenClass);
+    header.classList.add(noTransitionClass);
+    window.scrollTo({ top: 0, behavior: "instant" });
     page.scrollIntoView();
+    setTimeout(() => header.classList.remove(noTransitionClass), 100);
     btn.style.background = highCol;
   }
 }
@@ -52,6 +57,7 @@ function currentPageIndex() {
 // -----------------------------------------------------------------------------------------------------------------
 const stickyClass = "sticky";
 const fullscreenClass = "full";
+const noTransitionClass = "no-transition";
 const currentPageHeader = () => pages[currentPageIndex()].page.querySelector(".page-header");
 
 function scrollToCenter(element) {
@@ -317,13 +323,9 @@ function forceUp() {
 
 function horizontalMove(goLeft, controlledActivate) {
   document.activeElement.blur();
-  const pageIndex = currentPageIndex();
-  const pageNum = goLeft ? pageIndex - 1 : pageIndex + 1;
-  if (pageNum < 0 || pageNum >= pages.length) {
-    window.scrollTo({ top: 0 });
-    return;
-  }
-  controlledActivate(toPage, pageNum);
+  const curPageIndex = currentPageIndex();
+  const nextPageNum = goLeft ? curPageIndex - 1 : curPageIndex + 1;
+  controlledActivate(toPage, nextPageNum);
 }
 
 document.addEventListener("keydown", (event) => {
