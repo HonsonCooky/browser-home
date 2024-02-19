@@ -65,14 +65,14 @@ const currentPageHeader = () => pages[currentPageIndex()].page.querySelector(".p
 function scrollToCenter(element) {
   let elementRect = element.getBoundingClientRect();
   let absoluteElementTop = elementRect.top + window.scrollY;
-  let middle = absoluteElementTop - window.innerHeight / 5;
+  let middle = absoluteElementTop - 100;
   let header = currentPageHeader();
   if (header.classList.contains(fullscreenClass)) {
-    window.scrollTo({ top: 1 });
-    setTimeout(() => scrollToCenter(element), 600);
-  } else {
-    window.scrollTo({ top: middle });
+    header.classList.add(stickyClass);
+    header.classList.remove(fullscreenClass);
+    middle -= window.innerHeight - 100;
   }
+  window.scrollTo({ top: middle });
 }
 
 let scrollXPosition = 0;
@@ -118,21 +118,21 @@ function shortcutsPageKeyBindings(event) {
   const controlledActivate = preventDefaultAction(event);
   switch (event.key) {
     case "V":
-      controlledActivate(function() {
+      controlledActivate(function () {
         vimShortcuts.tabIndex = -1;
         vimShortcuts.focus({ preventScroll: true });
         scrollToCenter(vimShortcuts);
       });
       break;
     case "E":
-      controlledActivate(function() {
+      controlledActivate(function () {
         edgeShortcuts.tabIndex = -1;
         edgeShortcuts.focus({ preventScroll: true });
         scrollToCenter(edgeShortcuts);
       });
       break;
     case "B":
-      controlledActivate(function() {
+      controlledActivate(function () {
         vimiumShortcuts.tabIndex = -1;
         vimiumShortcuts.focus({ preventScroll: true });
         scrollToCenter(vimiumShortcuts);
@@ -140,7 +140,7 @@ function shortcutsPageKeyBindings(event) {
       break;
     case "/":
     case "s":
-      controlledActivate(function() {
+      controlledActivate(function () {
         if (document.activeElement.id === "") return;
         const input = document.activeElement.querySelector("input");
         if (input) {
@@ -266,7 +266,7 @@ function keyboardToolKeyBindings(event) {
   }
 }
 
-function todoToolKeyBindings() { }
+function todoToolKeyBindings() {}
 
 function toolsPageKeyBindings(event) {
   const controlledActivate = preventDefaultAction(event);
@@ -276,7 +276,7 @@ function toolsPageKeyBindings(event) {
       const element = isSection ? keyboardSection : activeKeyboard();
       keyboardMessage.innerText = isSection ? keyboardMsgs[1] : keyboardMsgs[2];
       if (!element) break;
-      controlledActivate(function() {
+      controlledActivate(function () {
         element.tabIndex = -1;
         element.focus({ preventScroll: true });
         if (isSection) scrollToCenter(element);
@@ -309,7 +309,7 @@ function pageBasedEvents(event) {
 }
 
 function preventDefaultAction(event) {
-  return function(action, ...params) {
+  return function (action, ...params) {
     event.preventDefault();
     action(...params);
   };
@@ -473,7 +473,7 @@ function createSearchBox(searchElement) {
   searchBox.type = "text";
   searchBox.placeholder = `Search`;
 
-  searchBox.addEventListener("keydown", function(event) {
+  searchBox.addEventListener("keydown", function (event) {
     if (event.key === "Enter") {
       event.preventDefault();
       if (this.value != prevQuery) searchChildren(searchElement, this.value, 0);
