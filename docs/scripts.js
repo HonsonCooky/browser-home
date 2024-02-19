@@ -614,9 +614,6 @@ function createKeyboardLayout(header, data) {
     divAllocation.push(layout);
   }
 
-  const layouts = document.createElement("div");
-  layouts.id = "keyboard-layouts";
-  layouts.className = "sub-section";
   for (let i = 0; i < rows; i++) {
     for (let j = 0; j < cols; j++) {
       for (let t = 0; t < titles.length; t++) {
@@ -711,6 +708,7 @@ function loadToDoLists() {
     const list = document.createElement("div");
     list.id = `${title}-list`;
     list.className = "list";
+    list.style.display = e === 0 ? "flex" : "none";
 
     btn.onclick = () => {
       todoLists.forEach((b) => (b.style.color = btnDefault));
@@ -719,9 +717,23 @@ function loadToDoLists() {
       list.style.display = "flex";
     };
 
-    keyboardLayers.push(btn);
+    todoLists.push(btn);
     divAllocation.push(list);
   }
+
+  // NEW LIST BUTTON
+  const btn = document.createElement("button");
+  btn.id = `new-list`;
+  btn.className = "trailing-btn";
+  btn.innerHTML = `<i class="nf nf-cod-add"></i>`;
+  btnRow.appendChild(btn);
+
+  btn.onclick = () => {
+    todoLists.forEach((b) => (b.style.color = btnDefault));
+    divAllocation.forEach((d) => (d.style.display = "none"));
+    btn.style.color = btnHighlight;
+    list.style.display = "flex";
+  };
 
   div.appendChild(headerContainer);
   div.appendChild(btnRow);
