@@ -592,7 +592,9 @@ function createKeyboardLayout(header, data) {
     title = `[${title.slice(0, 1)}]${title.slice(1)}`;
     const btn = document.createElement("button");
     btn.id = `${title}-btn`;
+    btn.title = `${titles[t]} layer button`;
     btn.innerText = title;
+    btn.type = "button";
     btn.style.color = t === 0 ? btnHighlight : btnDefault;
     btnRow.appendChild(btn);
 
@@ -674,6 +676,50 @@ fetch("./assets/keyboard-layout.json")
 // -----------------------------------------------------------------------------------------------------------------
 
 const todoListIdSuffix = "-todo-list";
+const todoListSection = "To Do";
+const doneListSection = "Done";
+
+function createListItem(listId, type, index, innerText) {
+  const li = document.createElement("div");
+  li.id = `${listId}-${type}-${index}`;
+  li.className = "list-item";
+
+  const indexor = document.createElement("span");
+  indexor.innerHTML = `<i class="nf nf-cod-dash"></i>`;
+  const text = document.createElement("span");
+  text.innerText = innerText;
+
+  if (type === doneListSection) {
+    text.style.textDecoration = "line-through";
+  }
+
+  li.onclick = () => {
+    if (type === todoListSection) {
+      todoListMoveToDone(listId, index);
+    } else if (type === doneListSection) {
+    }
+  };
+
+  li.appendChild(indexor);
+  li.appendChild(text);
+  return li;
+}
+
+function loadListItems(listId, cacheItem) {
+  const todos = [];
+  const dones = [];
+
+  for (let i = 0; i < cacheItem.todo.length; i++) {
+    const li = createListItem(listId, todoListSection, i, cacheItem.todo[i]);
+    todos.push(li);
+  }
+  for (let i = 0; i < cacheItem.done.length; i++) {
+    const li = createListItem(listId, doneListSection, i, cacheItem.done[i]);
+    dones.push(li);
+  }
+
+  return [todos, dones];
+}
 
 const todoLists = [];
 function loadToDoLists() {
@@ -701,7 +747,9 @@ function loadToDoLists() {
     let title = `[${String.fromCharCode(e + 65)}] ${entries[e][0].replace("-todo-list", "")}`;
     const btn = document.createElement("button");
     btn.id = `${title}-btn`;
+    btn.title = `${entries[e][0]} button`;
     btn.innerText = title;
+    btn.type = "button";
     btn.style.color = e === 0 ? btnHighlight : btnDefault;
     btnRow.appendChild(btn);
 
@@ -709,6 +757,20 @@ function loadToDoLists() {
     list.id = `${title}-list`;
     list.className = "list";
     list.style.display = e === 0 ? "flex" : "none";
+
+    const [todos, dones] = loadListItems(list.id, JSON.parse(entries[e][1]));
+
+    const todoTitle = document.createElement("h4");
+    todoTitle.id = `${title}-todo-title`;
+    todoTitle.innerText = `${todoListSection}:`;
+    list.appendChild(todoTitle);
+    todos.forEach((e) => list.appendChild(e));
+
+    const doneTitle = document.createElement("h4");
+    doneTitle.id = `${title}-done-title`;
+    doneTitle.innerText = `${doneListSection}:`;
+    list.appendChild(doneTitle);
+    dones.forEach((e) => list.appendChild(e));
 
     btn.onclick = () => {
       todoLists.forEach((b) => (b.style.color = btnDefault));
@@ -725,6 +787,8 @@ function loadToDoLists() {
   const btn = document.createElement("button");
   btn.id = `new-list`;
   btn.className = "trailing-btn";
+  btn.title = "New List Button";
+  btn.type = "button";
   btn.innerHTML = `<i class="nf nf-cod-add"></i>`;
   btnRow.appendChild(btn);
 
@@ -744,8 +808,16 @@ function loadToDoLists() {
 function createToDoList(uniqueTitle) {
   let check = localStorage.getItem(uniqueTitle);
   if (check) throw Error("This list already exists");
-  localStorage.setItem(`${uniqueTitle}${todoListIdSuffix}`, { hello: "world" });
+  localStorage.setItem(
+    `${uniqueTitle}${todoListIdSuffix}`,
+    JSON.stringify({
+      todo: ["hello", "world"],
+      done: ["this", "and", "that"],
+    }),
+  );
 }
+
+function todoListMoveToDone(listId, index) {}
 
 // -----------------------------------------------------------------------------------------------------------------
 // # STARTUP
@@ -756,5 +828,6 @@ window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", ({ 
   setHomeIcon();
 });
 
+createToDoList("MyList");
 loadToDoLists();
-toPage(0);
+toPage(1);
