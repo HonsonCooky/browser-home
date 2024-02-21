@@ -19,7 +19,7 @@ const pages = [
   },
 ];
 
-function toPage(pageNum) {
+function toPage(pageNum, instant) {
   if (document.activeElement.tagName.toLowerCase() === "input") return;
   if (!pageNum) pageNum = 0;
 
@@ -39,7 +39,7 @@ function toPage(pageNum) {
     header.classList.add(fullscreenClass);
     header.classList.add(noTransitionClass);
     window.scrollTo({ top: 0, behavior: "instant" });
-    page.scrollIntoView();
+    page.scrollIntoView({ behavior: instant ? "instant" : "smooth" });
     setTimeout(() => header.classList.remove(noTransitionClass), 100);
     btn.style.background = highCol;
   }
@@ -823,6 +823,9 @@ function todoListMoveToDone(listId, index) {}
 // # STARTUP
 // -----------------------------------------------------------------------------------------------------------------
 window.scrollTo(0, 0);
+window.addEventListener("resize", function () {
+  toPage(currentPageIndex(), true);
+});
 window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", ({ matches }) => {
   setFavicon();
   setHomeIcon();
