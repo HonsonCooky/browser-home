@@ -239,6 +239,12 @@ const activeKeyboard = () => document.activeElement.querySelector('.layout[style
 
 function keyboardToolKeyBindings(event) {
   switch (event.key) {
+    case "K":
+      const activeKeyb = activeKeyboard();
+      activeKeyb.tabIndex = -1;
+      activeKeyb.focus({ preventScroll: true });
+      keyboardMessage.innerText = keyboardMsgs[2];
+      break;
     case "0":
     case "B":
       keyboardLayers[0].click();
@@ -270,27 +276,33 @@ function todoToolKeyBindings() {}
 
 function toolsPageKeyBindings(event) {
   const controlledActivate = preventDefaultAction(event);
+
+  if (document.activeElement === keyboardSection) {
+    keyboardToolKeyBindings(event);
+    return;
+  }
+
   switch (event.key) {
     case "K":
-      const isSection = document.activeElement != keyboardSection;
-      const element = isSection ? keyboardSection : activeKeyboard();
-      keyboardMessage.innerText = isSection ? keyboardMsgs[1] : keyboardMsgs[2];
-      if (!element) break;
       controlledActivate(function () {
-        element.tabIndex = -1;
-        element.focus({ preventScroll: true });
-        if (isSection) scrollToCenter(element);
+        keyboardSection.tabIndex = -1;
+        keyboardSection.focus({ preventScroll: true });
+        scrollToCenter(keyboardSection);
       });
       break;
     case "T":
-      todoSection.tabIndex = -1;
-      todoSection.focus({ preventScroll: true });
-      scrollToCenter(todoSection);
+      controlledActivate(function () {
+        todoSection.tabIndex = -1;
+        todoSection.focus({ preventScroll: true });
+        scrollToCenter(todoSection);
+      });
       break;
     case "C":
-      canvasSection.tabIndex = -1;
-      canvasSection.focus({ preventScroll: true });
-      scrollToCenter(canvasSection);
+      controlledActivate(function () {
+        canvasSection.tabIndex = -1;
+        canvasSection.focus({ preventScroll: true });
+        scrollToCenter(canvasSection);
+      });
       break;
     default:
       if (document.activeElement === keyboardSection) keyboardToolKeyBindings(event);
@@ -586,7 +598,7 @@ function createKeyboardLayout(header, data) {
   const divAllocation = [];
   for (let t = 0; t < titles.length; t++) {
     const btnDefault = "rgba(var(--text))";
-    const btnHighlight = "rgba(var(--green))";
+    const btnHighlight = "rgba(var(--teal))";
 
     let title = titles[t];
     title = `[${title.slice(0, 1)}]${title.slice(1)}`;
@@ -742,7 +754,7 @@ function loadToDoLists() {
   const divAllocation = [];
   for (let e = 0; e < entries.length; e++) {
     const btnDefault = "rgba(var(--text))";
-    const btnHighlight = "rgba(var(--green))";
+    const btnHighlight = "rgba(var(--teal))";
 
     let title = `[${String.fromCharCode(e + 65)}] ${entries[e][0].replace("-todo-list", "")}`;
     const btn = document.createElement("button");
@@ -760,17 +772,27 @@ function loadToDoLists() {
 
     const [todos, dones] = loadListItems(list.id, JSON.parse(entries[e][1]));
 
-    const todoTitle = document.createElement("h4");
+    const todoDiv = document.createElement("div");
+    todoDiv.id = todoListSection;
+    todoDiv.className = "sub-section";
+    const todoTitle = document.createElement("h5");
     todoTitle.id = `${title}-todo-title`;
     todoTitle.innerText = `${todoListSection}:`;
-    list.appendChild(todoTitle);
-    todos.forEach((e) => list.appendChild(e));
+    todoTitle.style.color = "rgba(var(--yellow))";
+    todoDiv.appendChild(todoTitle);
+    todos.forEach((e) => todoDiv.appendChild(e));
+    list.appendChild(todoDiv);
 
-    const doneTitle = document.createElement("h4");
+    const doneDiv = document.createElement("div");
+    doneDiv.id = doneListSection;
+    doneDiv.className = "sub-section";
+    const doneTitle = document.createElement("h5");
     doneTitle.id = `${title}-done-title`;
     doneTitle.innerText = `${doneListSection}:`;
-    list.appendChild(doneTitle);
-    dones.forEach((e) => list.appendChild(e));
+    doneTitle.style.color = "rgba(var(--red))";
+    doneDiv.appendChild(doneTitle);
+    dones.forEach((e) => doneDiv.appendChild(e));
+    list.appendChild(doneDiv);
 
     btn.onclick = () => {
       todoLists.forEach((b) => (b.style.color = btnDefault));
@@ -789,6 +811,9 @@ function loadToDoLists() {
   btn.className = "trailing-btn";
   btn.title = "New List Button";
   btn.type = "button";
+  if (entries.length > 0) {
+    btn.style.flex = "none";
+  }
   btn.innerHTML = `<i class="nf nf-cod-add"></i>`;
   btnRow.appendChild(btn);
 
