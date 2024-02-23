@@ -183,7 +183,7 @@ function keyboardHighlightAll(event, highlight) {
 function keyboardTesting(event) {
   switch (event.key) {
     case "Escape":
-      keyboardMessage.innerText = keyboardMsgs[1];
+      keyboardMsg.innerText = keyboardMsgs[1];
       keyboardSection.tabIndex = -1;
       keyboardSection.focus({ preventScroll: true });
       scrollToCenter(keyboardSection);
@@ -243,7 +243,7 @@ function keyboardToolKeyBindings(event) {
       const activeKeyb = activeKeyboard();
       activeKeyb.tabIndex = -1;
       activeKeyb.focus({ preventScroll: true });
-      keyboardMessage.innerText = keyboardMsgs[2];
+      keyboardMsg.innerText = keyboardMsgs[2];
       break;
     case "0":
     case "B":
@@ -397,7 +397,7 @@ document.addEventListener("keydown", (event) => {
       horizontalMove(true, controlledActivate);
       break;
     case "Escape":
-      keyboardMessage.innerText = keyboardMsgs[0];
+      keyboardMsg.innerText = keyboardMsgs[0];
       controlledActivate(() => document.activeElement.blur());
       break;
     default:
@@ -410,7 +410,7 @@ document.addEventListener("keydown", (event) => {
 // # SEARCH BOX FUNCTIONALITY
 // -----------------------------------------------------------------------------------------------------------------
 
-function createSearchBox(searchElement) {
+function implementSearchBox(searchBox, searchElement) {
   let currentIndex = -1;
   let matches = [];
   let prevQuery = "";
@@ -480,11 +480,6 @@ function createSearchBox(searchElement) {
     }
   }
 
-  const searchBox = document.createElement("input");
-  searchBox.id = searchElement.id + "-input";
-  searchBox.type = "text";
-  searchBox.placeholder = `Search`;
-
   searchBox.addEventListener("keydown", function (event) {
     if (event.key === "Enter") {
       event.preventDefault();
@@ -505,6 +500,14 @@ function createSearchBox(searchElement) {
 // # SHORTCUT LOADING
 // -----------------------------------------------------------------------------------------------------------------
 
+function loadSection(key, level) {
+  const div = document.getElementById(`${key}-${level}`);
+  const headerDiv = div.querySelector(".header-container");
+  const searchBox = headerDiv.querySelector("input");
+  implementSearchBox(searchBox, div);
+  return div;
+}
+
 function createSubSection(key, level) {
   const div = document.createElement("div");
   div.id = `${key}-${level}`;
@@ -512,16 +515,7 @@ function createSubSection(key, level) {
 
   const header = document.createElement(`h${level + 2}`);
   header.innerText = key;
-  if (level != 0) {
-    div.appendChild(header);
-  } else {
-    const searchBox = createSearchBox(div);
-    const headerDiv = document.createElement("div");
-    headerDiv.className = "header-container";
-    headerDiv.appendChild(header);
-    headerDiv.appendChild(searchBox);
-    div.appendChild(headerDiv);
-  }
+  div.appendChild(header);
 
   return div;
 }
@@ -543,7 +537,7 @@ function createListElement(key, value, level) {
 }
 
 function createShortcut(key, value, level) {
-  const section = createSubSection(key, level);
+  const section = level === 0 ? loadSection(key, level) : createSubSection(key, level);
 
   Object.entries(value)
     .map(([key, value]) => {
@@ -573,28 +567,17 @@ fetch("./assets/vimium-shortcuts.json")
 
 const keyboardLayers = [];
 const keyboardMsgs = ["", "[K] Test Keyboard", "[Esc] Exit | Press key (without modifiers) to highlight location"];
-const keyboardMessage = document.createElement("span");
-function createKeyboardLayout(header, data) {
-  const div = document.createElement("div");
-  div.id = `${header}-0`;
-  div.className = "sub-section";
+const keyboardMsg = document.getElementById("keyboard-msg");
 
-  const headerContainer = document.createElement("div");
-  headerContainer.className = "header-container";
-  const h2 = document.createElement("h2");
-  h2.innerText = header;
-  keyboardMessage.innerText = keyboardMsgs[0];
-  headerContainer.appendChild(h2);
-  headerContainer.appendChild(keyboardMessage);
+function createKeyboardLayout(header, data) {
+  const div = document.getElementById(`${header}-0`);
+  keyboardMsg.innerText = keyboardMsgs[0];
 
   const { layers, titles } = data;
   const { meta, ...content } = layers;
   const [rows, cols] = meta.size.split("x").map(Number);
 
   // Title Buttons
-  const btnRow = document.createElement("div");
-  btnRow.id = `${header}-btn-row`;
-  btnRow.className = "btn-row";
   const divAllocation = [];
   for (let t = 0; t < titles.length; t++) {
     const btnDefault = "rgba(var(--text))";
@@ -602,16 +585,11 @@ function createKeyboardLayout(header, data) {
 
     let title = titles[t];
     title = `[${title.slice(0, 1)}]${title.slice(1)}`;
-    const btn = document.createElement("button");
-    btn.id = `${title}-btn`;
-    btn.title = `${titles[t]} layer button`;
-    btn.innerText = title;
-    btn.type = "button";
+    const btn = document.getElementById(`${title}-btn`);
     btn.style.color = t === 0 ? btnHighlight : btnDefault;
-    btnRow.appendChild(btn);
 
     const layout = document.createElement("div");
-    layout.id = `${title}-layout`;
+    layout.id = `keyboard-layout-${t}`;
     layout.className = "layout";
     layout.style.display = t === 0 ? "grid" : "none";
     layout.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
@@ -669,8 +647,6 @@ function createKeyboardLayout(header, data) {
     }
   }
 
-  div.appendChild(headerContainer);
-  div.appendChild(btnRow);
   divAllocation.forEach((d) => div.appendChild(d));
   return div;
 }
@@ -736,21 +712,10 @@ function loadListItems(listId, cacheItem) {
 const todoLists = [];
 function loadToDoLists() {
   const header = "To Dos";
-  const div = document.createElement("div");
-  div.id = `${header}-0`;
-  div.className = "sub-section";
-
-  const headerContainer = document.createElement("div");
-  headerContainer.className = "header-container";
-  const h2 = document.createElement("h2");
-  h2.innerText = header;
-  headerContainer.appendChild(h2);
-
+  const div = document.getElementById(`${header}-0`);
   const entries = Object.entries(localStorage).filter(([key, value]) => key.includes(todoListIdSuffix));
 
-  const btnRow = document.createElement("div");
-  btnRow.id = `${header}-btn-row`;
-  btnRow.className = "btn-row";
+  const btnRow = document.getElementById(`${header}-btn-row`);
   const divAllocation = [];
   for (let e = 0; e < entries.length; e++) {
     const btnDefault = "rgba(var(--text))";
@@ -763,7 +728,7 @@ function loadToDoLists() {
     btn.innerText = title;
     btn.type = "button";
     btn.style.color = e === 0 ? btnHighlight : btnDefault;
-    btnRow.appendChild(btn);
+    btnRow.prepend(btn);
 
     const list = document.createElement("div");
     list.id = `${title}-list`;
@@ -806,16 +771,10 @@ function loadToDoLists() {
   }
 
   // NEW LIST BUTTON
-  const btn = document.createElement("button");
-  btn.id = `new-list`;
-  btn.className = "trailing-btn";
-  btn.title = "New List Button";
-  btn.type = "button";
+  const btn = document.getElementById("new-list");
   if (entries.length > 0) {
     btn.style.flex = "none";
   }
-  btn.innerHTML = `<i class="nf nf-cod-add"></i>`;
-  btnRow.appendChild(btn);
 
   btn.onclick = () => {
     todoLists.forEach((b) => (b.style.color = btnDefault));
@@ -824,8 +783,6 @@ function loadToDoLists() {
     list.style.display = "flex";
   };
 
-  div.appendChild(headerContainer);
-  div.appendChild(btnRow);
   divAllocation.forEach((d) => div.appendChild(d));
   todoSection.appendChild(div);
 }
