@@ -357,6 +357,7 @@ input:focus,
 
 .btn-row>.trailing-btn {
   min-width: 5%;
+  font-size: 16px;
 }
 
 .layout {
@@ -404,4 +405,17 @@ input:focus,
 
 .list-item>span {
   margin: 0 2vw;
+}
+
+.new-item {
+  flex: 1;
+  margin: 2vh 2vw;
+  border: 2px solid rgba(var(--crust));
+  border-radius: 100vh;
+  background: rgba(var(--base));
+  padding: 0.5vh 2vw;
+  width: 80%;
+  height: 20px;
+  color: rgba(var(--text));
+  font-weight: 200;
 }

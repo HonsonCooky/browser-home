@@ -111,10 +111,10 @@ window.onscroll = () => {
 };
 
 // -----------------------------------------------------------------------------------------------------------------
-// # KEYBOARD EVENTS
+// # KEYBOARD EVENTS: SHORTCUTS
 // -----------------------------------------------------------------------------------------------------------------
 
-function shortcutsPageKeyBindings(event) {
+function keybindingsShortcutsPage(event) {
   const controlledActivate = preventDefaultAction(event);
   switch (event.key) {
     case "V":
@@ -151,10 +151,21 @@ function shortcutsPageKeyBindings(event) {
   }
 }
 
+// -----------------------------------------------------------------------------------------------------------------
+// # KEYBOARD EVENTS: TOOLS - KEYBOARD LAYOUT
+// -----------------------------------------------------------------------------------------------------------------
+
 let flatmapCache = [];
 const keyHighlightClass = "key-highlight";
 
-function keyboardHighlightSingle(event, highlight) {
+function preventDefaultAction(event) {
+  return function (action, ...params) {
+    event.preventDefault();
+    action(...params);
+  };
+}
+
+function keybindingsKeyboardHighlightSingle(event, highlight) {
   const key = event.key.toLowerCase();
   let location = flatmapCache.indexOf(key);
   if (event.location > 1) location = flatmapCache.indexOf(key, location + 1);
@@ -167,7 +178,7 @@ function keyboardHighlightSingle(event, highlight) {
   }
 }
 
-function keyboardHighlightAll(event, highlight) {
+function keybindingsKeyboardHighlightAll(event, highlight) {
   const key = event.key.toLowerCase();
   let locations = flatmapCache.map((k, i) => [k, i]).filter((a) => a[0] === key);
   locations.forEach((a) => {
@@ -180,7 +191,7 @@ function keyboardHighlightAll(event, highlight) {
   });
 }
 
-function keyboardTesting(event) {
+function keybindingsKeyboardLayout(event) {
   switch (event.key) {
     case "Escape":
       keyboardMsg.innerText = keyboardMsgs[1];
@@ -226,59 +237,80 @@ function keyboardTesting(event) {
 
       const key = event.key.toLowerCase();
       if (key != " ") {
-        keyboardHighlightSingle(event, true);
+        keybindingsKeyboardHighlightSingle(event, true);
       } else {
-        keyboardHighlightAll(event, true);
+        keybindingsKeyboardHighlightAll(event, true);
       }
 
       break;
   }
 }
 
-const activeKeyboard = () => document.activeElement.querySelector('.layout[style*="display: grid"]');
+document.addEventListener("keyup", (event) => {
+  if (document.activeElement.classList.contains("layout")) {
+    const key = event.key.toLowerCase();
+    if (key != " ") {
+      keybindingsKeyboardHighlightSingle(event, false);
+    } else {
+      keybindingsKeyboardHighlightAll(event, false);
+    }
+  }
+});
 
-function keyboardToolKeyBindings(event) {
+function currentKeyboardLayout() {
+  document.activeElement.querySelector('.layout[style*="display: grid"]');
+}
+
+function keybindingsKeyboard(event) {
   switch (event.key) {
     case "K":
-      const activeKeyb = activeKeyboard();
+      const activeKeyb = currentKeyboardLayout();
       activeKeyb.tabIndex = -1;
       activeKeyb.focus({ preventScroll: true });
       keyboardMsg.innerText = keyboardMsgs[2];
       break;
     case "0":
     case "B":
-      keyboardLayers[0].click();
+      document.getElementById(`keyboard-layout-btn-0`).click();
       break;
     case "1":
     case "L":
-      keyboardLayers[1].click();
+      document.getElementById(`keyboard-layout-btn-1`).click();
       break;
     case "2":
     case "R":
-      keyboardLayers[2].click();
+      document.getElementById(`keyboard-layout-btn-2`).click();
       break;
     case "3":
     case "A":
-      keyboardLayers[3].click();
+      document.getElementById(`keyboard-layout-btn-3`).click();
       break;
     case "4":
     case "M":
-      keyboardLayers[4].click();
+      document.getElementById(`keyboard-layout-btn-4`).click();
       break;
     case "5":
     case "T":
-      keyboardLayers[5].click();
+      document.getElementById(`keyboard-layout-btn-5`).click();
       break;
   }
 }
 
-function todoToolKeyBindings() {}
+// -----------------------------------------------------------------------------------------------------------------
+// # KEYBOARD EVENTS: TOOLS - TODO LIST
+// -----------------------------------------------------------------------------------------------------------------
 
-function toolsPageKeyBindings(event) {
+function keybindingsToDoList() {}
+
+// -----------------------------------------------------------------------------------------------------------------
+// # KEYBOARD EVENTS: TOOLS
+// -----------------------------------------------------------------------------------------------------------------
+
+function keybindingsToolsPage(event) {
   const controlledActivate = preventDefaultAction(event);
 
   if (document.activeElement === keyboardSection) {
-    keyboardToolKeyBindings(event);
+    keybindingsKeyboard(event);
     return;
   }
 
@@ -305,40 +337,15 @@ function toolsPageKeyBindings(event) {
       });
       break;
     default:
-      if (document.activeElement === keyboardSection) keyboardToolKeyBindings(event);
+      if (document.activeElement === keyboardSection) keybindingsKeyboard(event);
   }
 }
 
-function pageBasedEvents(event) {
-  switch (currentPageIndex()) {
-    case 0:
-      shortcutsPageKeyBindings(event);
-      break;
-    case 1:
-      toolsPageKeyBindings(event);
-      break;
-  }
-}
+// -----------------------------------------------------------------------------------------------------------------
+// # KEYBOARD EVENTS: GLOBAL
+// -----------------------------------------------------------------------------------------------------------------
 
-function preventDefaultAction(event) {
-  return function (action, ...params) {
-    event.preventDefault();
-    action(...params);
-  };
-}
-
-document.addEventListener("keyup", (event) => {
-  if (document.activeElement.classList.contains("layout")) {
-    const key = event.key.toLowerCase();
-    if (key != " ") {
-      keyboardHighlightSingle(event, false);
-    } else {
-      keyboardHighlightAll(event, false);
-    }
-  }
-});
-
-function forceUp() {
+function moveVert() {
   if (window.scrollY === 0) {
     document.activeElement.blur();
     const header = currentPageHeader();
@@ -348,11 +355,22 @@ function forceUp() {
   }
 }
 
-function horizontalMove(goLeft, controlledActivate) {
+function moveHori(goLeft, controlledActivate) {
   document.activeElement.blur();
   const curPageIndex = currentPageIndex();
   const nextPageNum = goLeft ? curPageIndex - 1 : curPageIndex + 1;
   controlledActivate(toPage, nextPageNum);
+}
+
+function pageBasedKey(event) {
+  switch (currentPageIndex()) {
+    case 0:
+      keybindingsShortcutsPage(event);
+      break;
+    case 1:
+      keybindingsToolsPage(event);
+      break;
+  }
 }
 
 document.addEventListener("keydown", (event) => {
@@ -361,8 +379,12 @@ document.addEventListener("keydown", (event) => {
 
   // Keyboard Testing
   if (document.activeElement.classList.contains("layout")) {
-    keyboardTesting(event);
+    keybindingsKeyboardLayout(event);
     return;
+  }
+
+  // To Do List Editing
+  if (document.activeElement.classList.contains("list")) {
   }
 
   if (event.ctrlKey) return;
@@ -377,7 +399,7 @@ document.addEventListener("keydown", (event) => {
     case "ArrowUp":
     case "k":
       controlledActivate(window.scrollBy, 0, -50);
-      forceUp();
+      moveVert();
       break;
     case "PageDown":
     case "d":
@@ -386,22 +408,22 @@ document.addEventListener("keydown", (event) => {
     case "PageUp":
     case "u":
       controlledActivate(window.scrollBy, 0, -(window.innerHeight - 300));
-      forceUp();
+      moveVert();
       break;
     case "ArrowRight":
     case "l":
-      horizontalMove(false, controlledActivate);
+      moveHori(false, controlledActivate);
       break;
     case "ArrowLeft":
     case "h":
-      horizontalMove(true, controlledActivate);
+      moveHori(true, controlledActivate);
       break;
     case "Escape":
       keyboardMsg.innerText = keyboardMsgs[0];
       controlledActivate(() => document.activeElement.blur());
       break;
     default:
-      pageBasedEvents(event);
+      pageBasedKey(event);
       break;
   }
 });
@@ -562,12 +584,51 @@ fetch("./assets/vimium-shortcuts.json")
   .then((data) => vimiumShortcuts.appendChild(createShortcut("Vimium", data, 0)));
 
 // -----------------------------------------------------------------------------------------------------------------
-// # TOOLS LOADING: Keyboard Layout
+// # TOOLS LOADING: KEYBOARD LAYOUT
 // -----------------------------------------------------------------------------------------------------------------
 
-const keyboardLayers = [];
 const keyboardMsgs = ["", "[K] Test Keyboard", "[Esc] Exit | Press key (without modifiers) to highlight location"];
 const keyboardMsg = document.getElementById("keyboard-msg");
+
+function loadKeyboardKeys(keyboardLayout, tIndex, rows, cols, titles, content) {
+  for (let i = 0; i < rows; i++) {
+    for (let j = 0; j < cols; j++) {
+      const keyBtn = document.createElement("div");
+      let value = content[i][j][tIndex];
+      let color = "rgba(var(--text))";
+      if (value.length === 0) {
+        value = content[i][j][0];
+        color = "rgba(var(--peach), 0.5)";
+      }
+      keyBtn.id = `${titles[tIndex]}-${value}`;
+      keyBtn.className = "keyboard-btn";
+
+      // Special buttons (shift, control, alt)
+      value = value.replaceAll("<A>", `<span class="special">Alt</span>`);
+      value = value.replaceAll("A-", `<span class="special">A-</span>`);
+      value = value.replaceAll("<C>", `<span class="special">Ctrl</span>`);
+      value = value.replaceAll("C-", `<span class="special">C-</span>`);
+      value = value.replaceAll("<S>", `<span class="special">Shift</span>`);
+      value = value.replaceAll("S-", `<span class="special">S-</span>`);
+
+      // Icons
+      value = value
+        .split("||")
+        .filter((str) => str.length > 0)
+        .map((str) => {
+          if (str.startsWith("nf-")) {
+            return `<i class="nf ${str}" style="color: ${color}"></i>`;
+          }
+          return str;
+        })
+        .join("");
+
+      keyBtn.innerHTML = value;
+      keyBtn.style.color = color;
+      keyboardLayout.appendChild(keyBtn);
+    }
+  }
+}
 
 function createKeyboardLayout(header, data) {
   const div = document.getElementById(`${header}-0`);
@@ -578,14 +639,13 @@ function createKeyboardLayout(header, data) {
   const [rows, cols] = meta.size.split("x").map(Number);
 
   // Title Buttons
-  const divAllocation = [];
   for (let t = 0; t < titles.length; t++) {
     const btnDefault = "rgba(var(--text))";
     const btnHighlight = "rgba(var(--teal))";
 
     let title = titles[t];
     title = `[${title.slice(0, 1)}]${title.slice(1)}`;
-    const btn = document.getElementById(`${title}-btn`);
+    const btn = document.getElementById(`keyboard-layout-btn-${t}`);
     btn.style.color = t === 0 ? btnHighlight : btnDefault;
 
     const layout = document.createElement("div");
@@ -595,59 +655,23 @@ function createKeyboardLayout(header, data) {
     layout.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
     layout.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
 
+    loadKeyboardKeys(layout, t, rows, cols, titles, content);
+
+    div.appendChild(layout);
+
     btn.onclick = () => {
-      keyboardLayers.forEach((b) => (b.style.color = btnDefault));
-      divAllocation.forEach((d) => (d.style.display = "none"));
+      document.querySelectorAll('[id^="keyboard-layout-btn-"]').forEach((b) => {
+        b.style.color = btnDefault;
+      });
+      console.log(document.querySelectorAll('[id^="keyboard-layout-"][id$=/\\d/g]'));
+      document.querySelectorAll('[id^="keyboard-layout-"][id$="\\d"]').forEach((d) => {
+        d.style.display = "none";
+      });
       btn.style.color = btnHighlight;
       layout.style.display = "grid";
     };
-
-    keyboardLayers.push(btn);
-    divAllocation.push(layout);
   }
 
-  for (let i = 0; i < rows; i++) {
-    for (let j = 0; j < cols; j++) {
-      for (let t = 0; t < titles.length; t++) {
-        const layoutDiv = divAllocation[t];
-        const keyboardBtn = document.createElement("div");
-        let value = content[i][j][t];
-        let color = "rgba(var(--text))";
-        if (value.length === 0) {
-          value = content[i][j][0];
-          color = "rgba(var(--peach), 0.5)";
-        }
-        keyboardBtn.id = `${titles[t]}-${value}`;
-        keyboardBtn.className = "keyboard-btn";
-
-        // Special buttons (shift, control, alt)
-        value = value.replaceAll("<A>", `<span class="special">Alt</span>`);
-        value = value.replaceAll("A-", `<span class="special">A-</span>`);
-        value = value.replaceAll("<C>", `<span class="special">Ctrl</span>`);
-        value = value.replaceAll("C-", `<span class="special">C-</span>`);
-        value = value.replaceAll("<S>", `<span class="special">Shift</span>`);
-        value = value.replaceAll("S-", `<span class="special">S-</span>`);
-
-        // Icons
-        value = value
-          .split("||")
-          .filter((str) => str.length > 0)
-          .map((str) => {
-            if (str.startsWith("nf-")) {
-              return `<i class="nf ${str}" style="color: ${color}"></i>`;
-            }
-            return str;
-          })
-          .join("");
-
-        keyboardBtn.innerHTML = value;
-        keyboardBtn.style.color = color;
-        layoutDiv.appendChild(keyboardBtn);
-      }
-    }
-  }
-
-  divAllocation.forEach((d) => div.appendChild(d));
   return div;
 }
 
@@ -667,13 +691,15 @@ const todoListIdSuffix = "-todo-list";
 const todoListSection = "To Do";
 const doneListSection = "Done";
 
-function createListItem(listId, type, index, innerText) {
+function todoListMoveToDone(listId, index) {}
+
+function generateLI(listId, type, index, innerText) {
   const li = document.createElement("div");
   li.id = `${listId}-${type}-${index}`;
   li.className = "list-item";
 
   const indexor = document.createElement("span");
-  indexor.innerHTML = `<i class="nf nf-cod-dash"></i>`;
+  indexor.innerHTML = `[${index}]`;
   const text = document.createElement("span");
   text.innerText = innerText;
 
@@ -693,83 +719,89 @@ function createListItem(listId, type, index, innerText) {
   return li;
 }
 
-function loadListItems(listId, cacheItem) {
+function loadLIs(listId, cacheItem) {
   const todos = [];
   const dones = [];
 
   for (let i = 0; i < cacheItem.todo.length; i++) {
-    const li = createListItem(listId, todoListSection, i, cacheItem.todo[i]);
+    const li = generateLI(listId, todoListSection, i, cacheItem.todo[i]);
     todos.push(li);
   }
   for (let i = 0; i < cacheItem.done.length; i++) {
-    const li = createListItem(listId, doneListSection, i, cacheItem.done[i]);
+    const li = generateLI(listId, doneListSection, i, cacheItem.done[i]);
     dones.push(li);
   }
 
   return [todos, dones];
 }
 
-const todoLists = [];
-function loadToDoLists() {
-  const header = "To Dos";
-  const div = document.getElementById(`${header}-0`);
-  const entries = Object.entries(localStorage).filter(([key, value]) => key.includes(todoListIdSuffix));
+function loadListFromEntry(index, entries, btnRow, divAllocation) {
+  const btnDefault = "rgba(var(--text))";
+  const btnHighlight = "rgba(var(--teal))";
 
-  const btnRow = document.getElementById(`${header}-btn-row`);
-  const divAllocation = [];
-  for (let e = 0; e < entries.length; e++) {
-    const btnDefault = "rgba(var(--text))";
-    const btnHighlight = "rgba(var(--teal))";
+  // List button (title)
+  let title = `[${String.fromCharCode(index + 65)}] ${entries[index][0].replace("-todo-list", "")}`;
+  const btn = document.createElement("button");
+  btn.id = `${title}-btn`;
+  btn.title = `${entries[index][0]} button`;
+  btn.innerText = title;
+  btn.type = "button";
+  btn.style.color = index === 0 ? btnHighlight : btnDefault;
+  btnRow.insertBefore(btn, document.getElementById("new-list"));
 
-    let title = `[${String.fromCharCode(e + 65)}] ${entries[e][0].replace("-todo-list", "")}`;
-    const btn = document.createElement("button");
-    btn.id = `${title}-btn`;
-    btn.title = `${entries[e][0]} button`;
-    btn.innerText = title;
-    btn.type = "button";
-    btn.style.color = e === 0 ? btnHighlight : btnDefault;
-    btnRow.prepend(btn);
+  // List contents
+  const list = document.createElement("div");
+  list.id = `${title}-list`;
+  list.className = "list";
+  list.style.display = index === 0 ? "flex" : "none";
 
-    const list = document.createElement("div");
-    list.id = `${title}-list`;
-    list.className = "list";
-    list.style.display = e === 0 ? "flex" : "none";
+  const [todos, dones] = loadLIs(list.id, JSON.parse(entries[index][1]));
 
-    const [todos, dones] = loadListItems(list.id, JSON.parse(entries[e][1]));
-
+  // TODO Section
+  if (todos.length > 0) {
     const todoDiv = document.createElement("div");
     todoDiv.id = todoListSection;
     todoDiv.className = "sub-section";
     const todoTitle = document.createElement("h5");
     todoTitle.id = `${title}-todo-title`;
     todoTitle.innerText = `${todoListSection}:`;
-    todoTitle.style.color = "rgba(var(--yellow))";
+    todoTitle.style.color = "rgba(var(--green))";
     todoDiv.appendChild(todoTitle);
     todos.forEach((e) => todoDiv.appendChild(e));
     list.appendChild(todoDiv);
+  }
 
+  // DONE Section
+  if (dones.length > 0) {
     const doneDiv = document.createElement("div");
     doneDiv.id = doneListSection;
     doneDiv.className = "sub-section";
     const doneTitle = document.createElement("h5");
     doneTitle.id = `${title}-done-title`;
     doneTitle.innerText = `${doneListSection}:`;
-    doneTitle.style.color = "rgba(var(--red))";
+    doneTitle.style.color = "rgba(var(--mauve))";
     doneDiv.appendChild(doneTitle);
     dones.forEach((e) => doneDiv.appendChild(e));
     list.appendChild(doneDiv);
-
-    btn.onclick = () => {
-      todoLists.forEach((b) => (b.style.color = btnDefault));
-      divAllocation.forEach((d) => (d.style.display = "none"));
-      btn.style.color = btnHighlight;
-      list.style.display = "flex";
-    };
-
-    todoLists.push(btn);
-    divAllocation.push(list);
   }
 
+  const addNewEntryBtn = document.createElement("input");
+  addNewEntryBtn.type = "text";
+  addNewEntryBtn.placeholder = "Add";
+  addNewEntryBtn.className = "new-item";
+  list.appendChild(addNewEntryBtn);
+
+  btn.onclick = () => {
+    todoLists.forEach((b) => (b.style.color = btnDefault));
+    divAllocation.forEach((d) => (d.style.display = "none"));
+    btn.style.color = btnHighlight;
+    list.style.display = "flex";
+  };
+
+  return [btn, list];
+}
+
+function initNewListButton(entries) {
   // NEW LIST BUTTON
   const btn = document.getElementById("new-list");
   if (entries.length > 0) {
@@ -782,24 +814,40 @@ function loadToDoLists() {
     btn.style.color = btnHighlight;
     list.style.display = "flex";
   };
+}
+
+const todoLists = [];
+function loadToDoLists() {
+  const header = "To Dos";
+  const div = document.getElementById(`${header}-0`);
+  const entries = Object.entries(localStorage).filter(([key, _]) => key.includes(todoListIdSuffix));
+
+  const btnRow = document.getElementById(`${header}-btn-row`);
+  const divAllocation = [];
+  for (let e = 0; e < entries.length; e++) {
+    const [btn, list] = loadListFromEntry(e, entries, btnRow, divAllocation);
+    todoLists.push(btn);
+    divAllocation.push(list);
+  }
+
+  initNewListButton(entries);
 
   divAllocation.forEach((d) => div.appendChild(d));
   todoSection.appendChild(div);
 }
 
-function createToDoList(uniqueTitle) {
-  let check = localStorage.getItem(uniqueTitle);
+function createToDoList(uniqueTitle, todos, dones) {
+  const title = `${uniqueTitle}${todoListIdSuffix}`;
+  let check = localStorage.getItem(title);
   if (check) throw Error("This list already exists");
   localStorage.setItem(
-    `${uniqueTitle}${todoListIdSuffix}`,
+    title,
     JSON.stringify({
-      todo: ["hello", "world"],
-      done: ["this", "and", "that"],
+      todo: todos,
+      done: dones,
     }),
   );
 }
-
-function todoListMoveToDone(listId, index) {}
 
 // -----------------------------------------------------------------------------------------------------------------
 // # STARTUP
@@ -813,6 +861,11 @@ window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", ({ 
   setHomeIcon();
 });
 
-createToDoList("MyList");
+// try {
+//   createToDoList("Another List", ["Hello", "World"], ["This", "And", "That"]);
+// } catch (e) {
+//   console.error(e);
+// }
+
 loadToDoLists();
 toPage(1);
