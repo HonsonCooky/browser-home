@@ -21,6 +21,7 @@ const pages = [
 
 function toPage(pageNum, instant) {
   if (document.activeElement.tagName.toLowerCase() === "input") return;
+  if (pageNum < 0 || pageNum >= pages.length) return;
   if (!pageNum) pageNum = 0;
 
   for (let i = 0; i < pages.length; i++) {
@@ -258,7 +259,7 @@ document.addEventListener("keyup", (event) => {
 });
 
 function currentKeyboardLayout() {
-  document.activeElement.querySelector('.layout[style*="display: grid"]');
+  return document.activeElement.querySelector('.layout[style*="display: grid"]');
 }
 
 function keybindingsKeyboard(event) {
@@ -300,7 +301,57 @@ function keybindingsKeyboard(event) {
 // # KEYBOARD EVENTS: TOOLS - TODO LIST
 // -----------------------------------------------------------------------------------------------------------------
 
-function keybindingsToDoList() {}
+function currentToDoList() {
+  return document.activeElement.querySelector('.list[style*="display: flex"]');
+}
+
+function keybindingsToDoList(event) {
+  const controlledActivate = preventDefaultAction(event);
+  switch (event.key) {
+    case "Escape":
+      controlledActivate(function () {
+        todoMsg.innerText = todoMsgs[1];
+        todoSection.tabIndex = -1;
+        todoSection.focus({ preventScroll: true });
+        scrollToCenter(todoSection);
+      });
+      break;
+    case "Enter":
+      break;
+    case "ArrowDown":
+    case "j":
+      break;
+    case "ArrowUp":
+    case "k":
+      break;
+    case "/":
+    case "s":
+      controlledActivate(function () {
+        const input = document.activeElement.querySelector("input");
+        input.focus();
+        todoMsg.innerText = todoMsgs[4];
+      });
+      break;
+  }
+}
+
+function keybindingsToDo(event) {
+  switch (event.key) {
+    case "T":
+      const activeList = currentToDoList();
+      activeList.tabIndex = -1;
+      activeList.focus({ preventScroll: true });
+      todoMsg.innerText = todoMsgs[2];
+      break;
+    case "+":
+      document.getElementById("new-list").click();
+      break;
+    default:
+      const element = document.activeElement.querySelector(`[id^="[${event.key}]"]`);
+      if (!element) break;
+      element.click();
+  }
+}
 
 // -----------------------------------------------------------------------------------------------------------------
 // # KEYBOARD EVENTS: TOOLS
@@ -314,9 +365,15 @@ function keybindingsToolsPage(event) {
     return;
   }
 
+  if (document.activeElement === todoSection) {
+    keybindingsToDo(event);
+    return;
+  }
+
   switch (event.key) {
     case "K":
       controlledActivate(function () {
+        keyboardMsg.innerText = keyboardMsgs[1];
         keyboardSection.tabIndex = -1;
         keyboardSection.focus({ preventScroll: true });
         scrollToCenter(keyboardSection);
@@ -324,6 +381,7 @@ function keybindingsToolsPage(event) {
       break;
     case "T":
       controlledActivate(function () {
+        todoMsg.innerText = todoMsgs[1];
         todoSection.tabIndex = -1;
         todoSection.focus({ preventScroll: true });
         scrollToCenter(todoSection);
@@ -374,8 +432,21 @@ function pageBasedKey(event) {
 }
 
 document.addEventListener("keydown", (event) => {
-  // Search Box
-  if (document.activeElement.id.includes("input")) return;
+  // Input Box
+  if (document.activeElement.tagName.toLowerCase() === "input") {
+    if (event.key === "Escape") {
+      const parent = document.activeElement.closest("section, .layout, .list");
+      if (parent) {
+        parent.tabIndex = -1;
+        parent.focus({ preventScroll: true });
+
+        if (parent.id.includes("list")) {
+          todoMsg.innerText = todoMsgs[2];
+        }
+      }
+      return;
+    }
+  }
 
   // Keyboard Testing
   if (document.activeElement.classList.contains("layout")) {
@@ -385,6 +456,8 @@ document.addEventListener("keydown", (event) => {
 
   // To Do List Editing
   if (document.activeElement.classList.contains("list")) {
+    keybindingsToDoList(event);
+    return;
   }
 
   if (event.ctrlKey) return;
@@ -420,6 +493,7 @@ document.addEventListener("keydown", (event) => {
       break;
     case "Escape":
       keyboardMsg.innerText = keyboardMsgs[0];
+      todoMsgs.innerText = todoMsgs[0];
       controlledActivate(() => document.activeElement.blur());
       break;
     default:
@@ -511,8 +585,6 @@ function implementSearchBox(searchBox, searchElement) {
       } else {
         findNext(this.value);
       }
-    } else if (event.key === "Escape") {
-      searchBox.blur();
     }
   });
   return searchBox;
@@ -663,8 +735,7 @@ function createKeyboardLayout(header, data) {
       document.querySelectorAll('[id^="keyboard-layout-btn-"]').forEach((b) => {
         b.style.color = btnDefault;
       });
-      console.log(document.querySelectorAll('[id^="keyboard-layout-"][id$=/\\d/g]'));
-      document.querySelectorAll('[id^="keyboard-layout-"][id$="\\d"]').forEach((d) => {
+      document.querySelectorAll(".layout").forEach((d) => {
         d.style.display = "none";
       });
       btn.style.color = btnHighlight;
@@ -690,6 +761,15 @@ fetch("./assets/keyboard-layout.json")
 const todoListIdSuffix = "-todo-list";
 const todoListSection = "To Do";
 const doneListSection = "Done";
+const todoMsgs = [
+  "",
+  "[T] Interact With List | [A-Z] Select List",
+  "[Esc] Exit | [Enter] Edit Selected Item | [j,Down] Select Item Below | [k,Up] Select Item Above" +
+    "\n[Alt + direction] Move Item Up/Down | [s,/] Enter Input Field",
+  "[Esc] Exit | [D] Move To Done | [X] Delete | [E] Edit",
+  "[Esc] Exit | [Enter] Add Item",
+];
+const todoMsg = document.getElementById("todo-msg");
 
 function todoListMoveToDone(listId, index) {}
 
@@ -760,7 +840,7 @@ function loadListFromEntry(index, entries, btnRow, divAllocation) {
   // TODO Section
   if (todos.length > 0) {
     const todoDiv = document.createElement("div");
-    todoDiv.id = todoListSection;
+    todoDiv.id = `${title}-${todoListSection}`;
     todoDiv.className = "sub-section";
     const todoTitle = document.createElement("h5");
     todoTitle.id = `${title}-todo-title`;
@@ -774,7 +854,7 @@ function loadListFromEntry(index, entries, btnRow, divAllocation) {
   // DONE Section
   if (dones.length > 0) {
     const doneDiv = document.createElement("div");
-    doneDiv.id = doneListSection;
+    doneDiv.id = `${title}-${doneListSection}`;
     doneDiv.className = "sub-section";
     const doneTitle = document.createElement("h5");
     doneTitle.id = `${title}-done-title`;
@@ -785,11 +865,11 @@ function loadListFromEntry(index, entries, btnRow, divAllocation) {
     list.appendChild(doneDiv);
   }
 
-  const addNewEntryBtn = document.createElement("input");
-  addNewEntryBtn.type = "text";
-  addNewEntryBtn.placeholder = "Add";
-  addNewEntryBtn.className = "new-item";
-  list.appendChild(addNewEntryBtn);
+  const newEntryInput = document.createElement("input");
+  newEntryInput.type = "text";
+  newEntryInput.placeholder = "Add";
+  newEntryInput.className = "new-item";
+  list.appendChild(newEntryInput);
 
   btn.onclick = () => {
     todoLists.forEach((b) => (b.style.color = btnDefault));
@@ -801,19 +881,28 @@ function loadListFromEntry(index, entries, btnRow, divAllocation) {
   return [btn, list];
 }
 
-function initNewListButton(entries) {
+function initNewListButton(entries, listViews) {
+  const btnDefault = "rgba(var(--text))";
+  const btnHighlight = "rgba(var(--teal))";
+
   // NEW LIST BUTTON
   const btn = document.getElementById("new-list");
+  todoLists.push(btn);
   if (entries.length > 0) {
     btn.style.flex = "none";
   }
 
+  const list = document.getElementById("new-list-view");
+  list.style.display = "none";
+
   btn.onclick = () => {
     todoLists.forEach((b) => (b.style.color = btnDefault));
-    divAllocation.forEach((d) => (d.style.display = "none"));
+    listViews.forEach((d) => (d.style.display = "none"));
     btn.style.color = btnHighlight;
     list.style.display = "flex";
   };
+
+  return list;
 }
 
 const todoLists = [];
@@ -823,16 +912,17 @@ function loadToDoLists() {
   const entries = Object.entries(localStorage).filter(([key, _]) => key.includes(todoListIdSuffix));
 
   const btnRow = document.getElementById(`${header}-btn-row`);
-  const divAllocation = [];
+  const listViews = [];
   for (let e = 0; e < entries.length; e++) {
-    const [btn, list] = loadListFromEntry(e, entries, btnRow, divAllocation);
+    const [btn, list] = loadListFromEntry(e, entries, btnRow, listViews);
     todoLists.push(btn);
-    divAllocation.push(list);
+    listViews.push(list);
   }
 
-  initNewListButton(entries);
+  const newListView = initNewListButton(entries, listViews);
+  listViews.push(newListView);
 
-  divAllocation.forEach((d) => div.appendChild(d));
+  listViews.forEach((d) => div.appendChild(d));
   todoSection.appendChild(div);
 }
 

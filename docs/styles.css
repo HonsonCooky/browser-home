@@ -195,7 +195,8 @@ section {
 
 section:focus,
 input:focus,
-.layout:focus {
+.layout:focus,
+.list:focus {
   border: 2px dotted rgba(var(--lavender)) !important;
 }
 
@@ -360,6 +361,10 @@ input:focus,
   font-size: 16px;
 }
 
+.tool-msg {
+  text-align: center;
+}
+
 .layout {
   grid-gap: 5px;
   border-radius: 1vh;
@@ -391,6 +396,7 @@ input:focus,
 
 .list {
   flex-direction: column;
+  border-radius: 1vh;
 }
 
 .list-item {
@@ -414,7 +420,6 @@ input:focus,
   border-radius: 100vh;
   background: rgba(var(--base));
   padding: 0.5vh 2vw;
-  width: 80%;
   height: 20px;
   color: rgba(var(--text));
   font-weight: 200;

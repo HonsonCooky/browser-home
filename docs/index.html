@@ -7,7 +7,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   </meta>
   <title>New Tab</title>
-  <link rel="icon" href="./assets/HC_LOGO_LIGHT_128x128.png">
+  <link rel="icon" type="image/x-icon" href="./assets/HC_LOGO_LIGHT_48x48.png">
   </link>
   <link rel="stylesheet" href="styles.css">
   </link>
@@ -64,7 +64,7 @@
         <div id="Keyboard Layout-0" class="sub-section">
           <div class="header-container">
             <h2>Keyboard Layout</h2>
-            <span id="keyboard-msg"></span>
+            <span id="keyboard-msg" class="tool-msg"></span>
           </div>
           <div id="Keyboard Layout-btn-row" class="btn-row">
             <button id="keyboard-layout-btn-0" title="Base layer button" type="button"
@@ -98,12 +98,16 @@
         <div id="To Dos-0" class="sub-section">
           <div class="header-container">
             <h2>To Dos</h2>
-            <span id="todo-msg"></span>
+            <span id="todo-msg" class="tool-msg"></span>
           </div>
           <div id="To Dos-btn-row" class="btn-row">
             <button id="new-list" class="trailing-btn" title="New List Button" type="button" style="flex: 0 0 auto;">
               [+]
             </button>
+          </div>
+          <div id="new-list-view" class="list sub-section">
+            <h5>Create New ToDo List</h5>
+            <input id="new-list-title" class="new-item" placeholder="List Title"></<input>
           </div>
         </div>
       </section>

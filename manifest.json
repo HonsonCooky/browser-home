@@ -5,14 +5,13 @@
   "description": "A custom homepage for edge that adds tools and helpful information.",
   "chrome_settings_overrides": {
     "homepage": "https://browser.github.honsoncooky.dev",
-    "startup_pages": [
-      "https://browser.github.honsoncooky.dev"
-    ]
+    "startup_pages": ["https://browser.github.honsoncooky.dev"]
   },
   "chrome_url_overrides": {
     "newtab": "./docs/index.html"
   },
   "icons": {
+    "48": "./docs/assets/HC_LOGO_LIGHT_48x48.png",
     "128": "./docs/assets/HC_LOGO_LIGHT_128x128.png"
   }
 }
