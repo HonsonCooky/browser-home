@@ -119,21 +119,21 @@ function keybindingsShortcutsPage(event) {
   const controlledActivate = preventDefaultAction(event);
   switch (event.key) {
     case "V":
-      controlledActivate(function() {
+      controlledActivate(function () {
         vimShortcuts.tabIndex = -1;
         vimShortcuts.focus({ preventScroll: true });
         scrollToCenter(vimShortcuts);
       });
       break;
     case "E":
-      controlledActivate(function() {
+      controlledActivate(function () {
         edgeShortcuts.tabIndex = -1;
         edgeShortcuts.focus({ preventScroll: true });
         scrollToCenter(edgeShortcuts);
       });
       break;
     case "B":
-      controlledActivate(function() {
+      controlledActivate(function () {
         vimiumShortcuts.tabIndex = -1;
         vimiumShortcuts.focus({ preventScroll: true });
         scrollToCenter(vimiumShortcuts);
@@ -141,7 +141,7 @@ function keybindingsShortcutsPage(event) {
       break;
     case "/":
     case "s":
-      controlledActivate(function() {
+      controlledActivate(function () {
         if (document.activeElement.id === "") return;
         const input = document.activeElement.querySelector("input");
         if (input) {
@@ -160,7 +160,7 @@ let flatmapCache = [];
 const keyHighlightClass = "key-highlight";
 
 function preventDefaultAction(event) {
-  return function(action, ...params) {
+  return function (action, ...params) {
     event.preventDefault();
     action(...params);
   };
@@ -330,11 +330,13 @@ function selectAnotherItem(isDown) {
   element.scrollIntoView({ block: "center", inline: "nearest" });
 }
 
+function moveItem(isDown) {}
+
 function keybindingsToDoList(event) {
   const controlledActivate = preventDefaultAction(event);
   switch (event.key) {
     case "Escape":
-      controlledActivate(function() {
+      controlledActivate(function () {
         todoMsg.innerText = todoMsgs[1];
         todoSection.tabIndex = -1;
         todoSection.focus({ preventScroll: true });
@@ -343,15 +345,27 @@ function keybindingsToDoList(event) {
       break;
     case "ArrowDown":
     case "j":
-      selectAnotherItem(true);
+      controlledActivate(function () {
+        if (event.altKey) {
+          moveToDoListItem(true);
+        } else {
+          selectAnotherItem(true);
+        }
+      });
       break;
     case "ArrowUp":
     case "k":
-      selectAnotherItem(false);
+      controlledActivate(function () {
+        if (event.altKey) {
+          moveToDoListItem(false);
+        } else {
+          selectAnotherItem(false);
+        }
+      });
       break;
     case "/":
     case "s":
-      controlledActivate(function() {
+      controlledActivate(function () {
         removeAllHighlights(document.activeElement);
         const input = document.activeElement.querySelector("input");
         input.focus();
@@ -398,7 +412,7 @@ function keybindingsToolsPage(event) {
 
   switch (event.key) {
     case "K":
-      controlledActivate(function() {
+      controlledActivate(function () {
         keyboardMsg.innerText = keyboardMsgs[1];
         keyboardSection.tabIndex = -1;
         keyboardSection.focus({ preventScroll: true });
@@ -406,7 +420,7 @@ function keybindingsToolsPage(event) {
       });
       break;
     case "T":
-      controlledActivate(function() {
+      controlledActivate(function () {
         todoMsg.innerText = todoMsgs[1];
         todoSection.tabIndex = -1;
         todoSection.focus({ preventScroll: true });
@@ -414,7 +428,7 @@ function keybindingsToolsPage(event) {
       });
       break;
     case "C":
-      controlledActivate(function() {
+      controlledActivate(function () {
         canvasSection.tabIndex = -1;
         canvasSection.focus({ preventScroll: true });
         scrollToCenter(canvasSection);
@@ -602,7 +616,7 @@ function implementSearchBox(searchBox, searchElement) {
     }
   }
 
-  searchBox.addEventListener("keydown", function(event) {
+  searchBox.addEventListener("keydown", function (event) {
     if (event.key === "Enter") {
       event.preventDefault();
       if (this.value != prevQuery) searchChildren(searchElement, this.value, 0);
@@ -791,7 +805,7 @@ const todoMsgs = [
   "",
   "[T] Interact With List | [A-Z] Select List",
   "[Esc] Exit | [j,k,UP,DOWN] Select Item | <A-j,k,UP,DOWN> Move Item\n" +
-  " [D] Mark Done | [X] Delete | [s,/] Enter Input Field",
+    " [D] Mark Done | [X] Delete | [s,/] Enter Input Field",
   "[Esc] Exit | [Enter] Add Item",
 ];
 const todoMsg = document.getElementById("todo-msg");
@@ -845,9 +859,76 @@ function getAllStorageLists() {
 }
 
 function reloadList(title) {
-  const cache = localStorage.getItem(title);
+  const focusInput = document.activeElement.id.includes(`${title}-input`);
+  const value = localStorage.getItem(title);
+
+  // Reset the element
   const listElement = document.getElementById(`${title}-list`);
-  console.log(listElement);
+  listElement.innerHTML = "";
+  listElement.innerText = "";
+
+  const [todos, dones] = loadLIs(listElement.id, JSON.parse(value));
+  const [todoDiv, doneDiv] = initToDoSubSections(title, todos, dones);
+  if (todoDiv) listElement.appendChild(todoDiv);
+  if (doneDiv) listElement.appendChild(doneDiv);
+  const newEntryInput = createNewEntryInput(title);
+  listElement.appendChild(newEntryInput);
+
+  if (focusInput) {
+    newEntryInput.focus();
+  } else {
+    listElement.tabIndex = -1;
+    listElement.focus({ preventScroll: true });
+    todoMsg.innerText = todoMsgs[2];
+  }
+}
+
+function createNewEntryInput(title) {
+  const newEntryInput = document.createElement("input");
+  newEntryInput.id = `${title}-input`;
+  newEntryInput.type = "text";
+  newEntryInput.placeholder = "Add";
+  newEntryInput.className = "new-item";
+  newEntryInput.addEventListener("keydown", function (event) {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      const parent = document.activeElement.closest("section, .layout, .list");
+      addToDoListItem(parent.id.replace("-list-list", "-list"), newEntryInput.value);
+    }
+  });
+  return newEntryInput;
+}
+
+function initToDoSubSections(title, todos, dones) {
+  let todoDiv, doneDiv;
+
+  // TODO Section
+  if (todos.length > 0) {
+    todoDiv = document.createElement("div");
+    todoDiv.id = `${title}-${todoListSection}`;
+    todoDiv.className = "sub-section";
+    const todoTitle = document.createElement("h5");
+    todoTitle.id = `${title}-todo-title`;
+    todoTitle.innerText = `${todoListSection}:`;
+    todoTitle.style.color = "rgba(var(--green))";
+    todoDiv.appendChild(todoTitle);
+    todos.forEach((e) => todoDiv.appendChild(e));
+  }
+
+  // DONE Section
+  if (dones.length > 0) {
+    doneDiv = document.createElement("div");
+    doneDiv.id = `${title}-${doneListSection}`;
+    doneDiv.className = "sub-section";
+    const doneTitle = document.createElement("h5");
+    doneTitle.id = `${title}-done-title`;
+    doneTitle.innerText = `${doneListSection}:`;
+    doneTitle.style.color = "rgba(var(--mauve))";
+    doneDiv.appendChild(doneTitle);
+    dones.forEach((e) => doneDiv.appendChild(e));
+  }
+
+  return [todoDiv, doneDiv];
 }
 
 function initListFromEntry(index, title, content, btnRow, listViews) {
@@ -855,11 +936,11 @@ function initListFromEntry(index, title, content, btnRow, listViews) {
   const btnHighlight = "rgba(var(--teal))";
 
   // List button (title)
-  let t = `[${String.fromCharCode(index + 65)}] ${title.replace("-todo-list", "")}`;
+  let prettyTitle = `[${String.fromCharCode(index + 65)}] ${title.replace("-todo-list", "")}`;
   const btn = document.createElement("button");
-  btn.id = `${t}-btn`;
-  btn.title = `${t} button`;
-  btn.innerText = t;
+  btn.id = `${prettyTitle}-btn`;
+  btn.title = `${prettyTitle} button`;
+  btn.innerText = prettyTitle;
   btn.type = "button";
   btn.style.color = index === 0 ? btnHighlight : btnDefault;
   btnRow.insertBefore(btn, document.getElementById("new-list"));
@@ -871,46 +952,11 @@ function initListFromEntry(index, title, content, btnRow, listViews) {
   list.style.display = index === 0 ? "flex" : "none";
 
   const [todos, dones] = loadLIs(list.id, content);
+  const [todoDiv, doneDiv] = initToDoSubSections(title, todos, dones);
+  if (todoDiv) list.appendChild(todoDiv);
+  if (doneDiv) list.appendChild(doneDiv);
 
-  // TODO Section
-  if (todos.length > 0) {
-    const todoDiv = document.createElement("div");
-    todoDiv.id = `${t}-${todoListSection}`;
-    todoDiv.className = "sub-section";
-    const todoTitle = document.createElement("h5");
-    todoTitle.id = `${t}-todo-title`;
-    todoTitle.innerText = `${todoListSection}:`;
-    todoTitle.style.color = "rgba(var(--green))";
-    todoDiv.appendChild(todoTitle);
-    todos.forEach((e) => todoDiv.appendChild(e));
-    list.appendChild(todoDiv);
-  }
-
-  // DONE Section
-  if (dones.length > 0) {
-    const doneDiv = document.createElement("div");
-    doneDiv.id = `${t}-${doneListSection}`;
-    doneDiv.className = "sub-section";
-    const doneTitle = document.createElement("h5");
-    doneTitle.id = `${t}-done-title`;
-    doneTitle.innerText = `${doneListSection}:`;
-    doneTitle.style.color = "rgba(var(--mauve))";
-    doneDiv.appendChild(doneTitle);
-    dones.forEach((e) => doneDiv.appendChild(e));
-    list.appendChild(doneDiv);
-  }
-
-  const newEntryInput = document.createElement("input");
-  newEntryInput.type = "text";
-  newEntryInput.placeholder = "Add";
-  newEntryInput.className = "new-item";
-  newEntryInput.addEventListener("keydown", function(event) {
-    if (event.key === "Enter") {
-      event.preventDefault();
-      const parent = document.activeElement.closest("section, .layout, .list");
-      addToDoListItem(parent.id.replace("-list-list", "-list"), newEntryInput.value);
-    }
-  });
+  const newEntryInput = createNewEntryInput(title);
   list.appendChild(newEntryInput);
 
   btn.onclick = () => {
@@ -996,15 +1042,45 @@ function addToDoListItem(listId, text) {
   reloadList(listId);
 }
 
-function deleteToDoListItem(listId, section, index) { }
+function deleteToDoListItem(listId, section, index) {}
 
-function moveToDoListItem(listId, section, index) { }
+function shiftElement(arr, oldIndex, newIndex) {
+  const item = arr.splice(oldIndex, 1)[0];
+  arr.splice(newIndex, 0, item);
+}
+
+function moveToDoListItem(isDown) {
+  const highlighted = document.activeElement.querySelector(".list-item.list-highlight");
+  if (!highlighted) return;
+
+  const info = highlighted.id.split("-");
+  const listId = `${info[0]}-${info[1]}-${info[2]}`;
+  const section = info[info.length - 2];
+  const index = parseInt(info[info.length - 1]);
+
+  let cacheItem = localStorage.getItem(listId);
+  if (!cacheItem) return;
+  cacheItem = JSON.parse(cacheItem);
+
+  const concernedArr = section === todoListSection ? cacheItem.todo : cacheItem.done;
+  let newIndex = isDown ? (index + 1) % concernedArr.length : index - 1;
+  if (newIndex < 0) newIndex += concernedArr.length;
+  shiftElement(concernedArr, index, newIndex);
+
+  localStorage.setItem(listId, JSON.stringify(cacheItem));
+  reloadList(listId);
+  const listItem = document.getElementById(`${info.slice(0, info.length - 1).join("-")}-${newIndex}`);
+  if (listItem) {
+    listItem.classList.add(listItemHighlightClass);
+    listItem.scrollIntoView({ block: "center", inline: "nearest" });
+  }
+}
 
 // -----------------------------------------------------------------------------------------------------------------
 // # STARTUP
 // -----------------------------------------------------------------------------------------------------------------
 window.scrollTo(0, 0);
-window.addEventListener("resize", function() {
+window.addEventListener("resize", function () {
   toPage(currentPageIndex(), true);
 });
 window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", ({ matches }) => {
