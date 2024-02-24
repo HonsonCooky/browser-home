@@ -119,21 +119,21 @@ function keybindingsShortcutsPage(event) {
   const controlledActivate = preventDefaultAction(event);
   switch (event.key) {
     case "V":
-      controlledActivate(function () {
+      controlledActivate(function() {
         vimShortcuts.tabIndex = -1;
         vimShortcuts.focus({ preventScroll: true });
         scrollToCenter(vimShortcuts);
       });
       break;
     case "E":
-      controlledActivate(function () {
+      controlledActivate(function() {
         edgeShortcuts.tabIndex = -1;
         edgeShortcuts.focus({ preventScroll: true });
         scrollToCenter(edgeShortcuts);
       });
       break;
     case "B":
-      controlledActivate(function () {
+      controlledActivate(function() {
         vimiumShortcuts.tabIndex = -1;
         vimiumShortcuts.focus({ preventScroll: true });
         scrollToCenter(vimiumShortcuts);
@@ -141,7 +141,7 @@ function keybindingsShortcutsPage(event) {
       break;
     case "/":
     case "s":
-      controlledActivate(function () {
+      controlledActivate(function() {
         if (document.activeElement.id === "") return;
         const input = document.activeElement.querySelector("input");
         if (input) {
@@ -160,7 +160,7 @@ let flatmapCache = [];
 const keyHighlightClass = "key-highlight";
 
 function preventDefaultAction(event) {
-  return function (action, ...params) {
+  return function(action, ...params) {
     event.preventDefault();
     action(...params);
   };
@@ -334,7 +334,7 @@ function keybindingsToDoList(event) {
   const controlledActivate = preventDefaultAction(event);
   switch (event.key) {
     case "Escape":
-      controlledActivate(function () {
+      controlledActivate(function() {
         todoMsg.innerText = todoMsgs[1];
         todoSection.tabIndex = -1;
         todoSection.focus({ preventScroll: true });
@@ -351,7 +351,7 @@ function keybindingsToDoList(event) {
       break;
     case "/":
     case "s":
-      controlledActivate(function () {
+      controlledActivate(function() {
         removeAllHighlights(document.activeElement);
         const input = document.activeElement.querySelector("input");
         input.focus();
@@ -398,7 +398,7 @@ function keybindingsToolsPage(event) {
 
   switch (event.key) {
     case "K":
-      controlledActivate(function () {
+      controlledActivate(function() {
         keyboardMsg.innerText = keyboardMsgs[1];
         keyboardSection.tabIndex = -1;
         keyboardSection.focus({ preventScroll: true });
@@ -406,7 +406,7 @@ function keybindingsToolsPage(event) {
       });
       break;
     case "T":
-      controlledActivate(function () {
+      controlledActivate(function() {
         todoMsg.innerText = todoMsgs[1];
         todoSection.tabIndex = -1;
         todoSection.focus({ preventScroll: true });
@@ -414,7 +414,7 @@ function keybindingsToolsPage(event) {
       });
       break;
     case "C":
-      controlledActivate(function () {
+      controlledActivate(function() {
         canvasSection.tabIndex = -1;
         canvasSection.focus({ preventScroll: true });
         scrollToCenter(canvasSection);
@@ -602,7 +602,7 @@ function implementSearchBox(searchBox, searchElement) {
     }
   }
 
-  searchBox.addEventListener("keydown", function (event) {
+  searchBox.addEventListener("keydown", function(event) {
     if (event.key === "Enter") {
       event.preventDefault();
       if (this.value != prevQuery) searchChildren(searchElement, this.value, 0);
@@ -791,7 +791,7 @@ const todoMsgs = [
   "",
   "[T] Interact With List | [A-Z] Select List",
   "[Esc] Exit | [j,k,UP,DOWN] Select Item | <A-j,k,UP,DOWN> Move Item\n" +
-    " [D] Mark Done | [X] Delete | [s,/] Enter Input Field",
+  " [D] Mark Done | [X] Delete | [s,/] Enter Input Field",
   "[Esc] Exit | [Enter] Add Item",
 ];
 const todoMsg = document.getElementById("todo-msg");
@@ -838,35 +838,47 @@ function loadLIs(listId, cacheItem) {
   return [todos, dones];
 }
 
-function loadListFromEntry(index, entries, btnRow, divAllocation) {
+function getAllStorageLists() {
+  return Object.entries(localStorage)
+    .filter(([key, _]) => key.includes(todoListIdSuffix))
+    .map(([key, value]) => [key, JSON.parse(value)]);
+}
+
+function reloadList(title) {
+  const cache = localStorage.getItem(title);
+  const listElement = document.getElementById(`${title}-list`);
+  console.log(listElement);
+}
+
+function initListFromEntry(index, title, content, btnRow, listViews) {
   const btnDefault = "rgba(var(--text))";
   const btnHighlight = "rgba(var(--teal))";
 
   // List button (title)
-  let title = `[${String.fromCharCode(index + 65)}] ${entries[index][0].replace("-todo-list", "")}`;
+  let t = `[${String.fromCharCode(index + 65)}] ${title.replace("-todo-list", "")}`;
   const btn = document.createElement("button");
-  btn.id = `${title}-btn`;
-  btn.title = `${title} button`;
-  btn.innerText = title;
+  btn.id = `${t}-btn`;
+  btn.title = `${t} button`;
+  btn.innerText = t;
   btn.type = "button";
   btn.style.color = index === 0 ? btnHighlight : btnDefault;
   btnRow.insertBefore(btn, document.getElementById("new-list"));
 
   // List contents
   const list = document.createElement("div");
-  list.id = `${entries[index][0]}-list`;
+  list.id = `${title}-list`;
   list.className = "list";
   list.style.display = index === 0 ? "flex" : "none";
 
-  const [todos, dones] = loadLIs(list.id, JSON.parse(entries[index][1]));
+  const [todos, dones] = loadLIs(list.id, content);
 
   // TODO Section
   if (todos.length > 0) {
     const todoDiv = document.createElement("div");
-    todoDiv.id = `${title}-${todoListSection}`;
+    todoDiv.id = `${t}-${todoListSection}`;
     todoDiv.className = "sub-section";
     const todoTitle = document.createElement("h5");
-    todoTitle.id = `${title}-todo-title`;
+    todoTitle.id = `${t}-todo-title`;
     todoTitle.innerText = `${todoListSection}:`;
     todoTitle.style.color = "rgba(var(--green))";
     todoDiv.appendChild(todoTitle);
@@ -877,10 +889,10 @@ function loadListFromEntry(index, entries, btnRow, divAllocation) {
   // DONE Section
   if (dones.length > 0) {
     const doneDiv = document.createElement("div");
-    doneDiv.id = `${title}-${doneListSection}`;
+    doneDiv.id = `${t}-${doneListSection}`;
     doneDiv.className = "sub-section";
     const doneTitle = document.createElement("h5");
-    doneTitle.id = `${title}-done-title`;
+    doneTitle.id = `${t}-done-title`;
     doneTitle.innerText = `${doneListSection}:`;
     doneTitle.style.color = "rgba(var(--mauve))";
     doneDiv.appendChild(doneTitle);
@@ -892,7 +904,7 @@ function loadListFromEntry(index, entries, btnRow, divAllocation) {
   newEntryInput.type = "text";
   newEntryInput.placeholder = "Add";
   newEntryInput.className = "new-item";
-  newEntryInput.addEventListener("keydown", function (event) {
+  newEntryInput.addEventListener("keydown", function(event) {
     if (event.key === "Enter") {
       event.preventDefault();
       const parent = document.activeElement.closest("section, .layout, .list");
@@ -903,7 +915,7 @@ function loadListFromEntry(index, entries, btnRow, divAllocation) {
 
   btn.onclick = () => {
     todoLists.forEach((b) => (b.style.color = btnDefault));
-    divAllocation.forEach((d) => (d.style.display = "none"));
+    listViews.forEach((d) => (d.style.display = "none"));
     btn.style.color = btnHighlight;
     list.style.display = "flex";
   };
@@ -936,20 +948,21 @@ function initNewListButton(entries, listViews) {
 }
 
 const todoLists = [];
-function loadToDoLists() {
+function initToDoLists() {
   const header = "To Dos";
   const div = document.getElementById(`${header}-0`);
-  const entries = Object.entries(localStorage).filter(([key, _]) => key.includes(todoListIdSuffix));
+  const cacheLists = getAllStorageLists();
 
   const btnRow = document.getElementById(`${header}-btn-row`);
   const listViews = [];
-  for (let e = 0; e < entries.length; e++) {
-    const [btn, list] = loadListFromEntry(e, entries, btnRow, listViews);
+  for (let e = 0; e < cacheLists.length; e++) {
+    const [title, content] = cacheLists[e];
+    const [btn, list] = initListFromEntry(e, title, content, btnRow, listViews);
     todoLists.push(btn);
     listViews.push(list);
   }
 
-  const newListView = initNewListButton(entries, listViews);
+  const newListView = initNewListButton(cacheLists, listViews);
   listViews.push(newListView);
 
   listViews.forEach((d) => div.appendChild(d));
@@ -971,27 +984,27 @@ function createToDoList(uniqueTitle, todos, dones) {
 
 function addToDoListItem(listId, text) {
   let cacheItem = localStorage.getItem(listId);
-  console.log(cacheItem, text);
-  // if (!cacheItem) return;
-  // cacheItem = JSON.parse(cacheItem);
-  // localStorage.setItem(
-  //   listId,
-  //   JSON.stringify({
-  //     todo: [...cacheItem.todo, text],
-  //     done: [...cacheItem.done],
-  //   }),
-  // );
+  if (!cacheItem) return;
+  cacheItem = JSON.parse(cacheItem);
+  localStorage.setItem(
+    listId,
+    JSON.stringify({
+      todo: [...cacheItem.todo, text],
+      done: [...cacheItem.done],
+    }),
+  );
+  reloadList(listId);
 }
 
-function deleteToDoListItem(listId, section, index) {}
+function deleteToDoListItem(listId, section, index) { }
 
-function moveToDoListItem(listId, section, index) {}
+function moveToDoListItem(listId, section, index) { }
 
 // -----------------------------------------------------------------------------------------------------------------
 // # STARTUP
 // -----------------------------------------------------------------------------------------------------------------
 window.scrollTo(0, 0);
-window.addEventListener("resize", function () {
+window.addEventListener("resize", function() {
   toPage(currentPageIndex(), true);
 });
 window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", ({ matches }) => {
@@ -1005,5 +1018,5 @@ window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", ({ 
 //   console.error(e);
 // }
 
-loadToDoLists();
+initToDoLists();
 toPage(1);
