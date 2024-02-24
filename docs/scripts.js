@@ -301,8 +301,33 @@ function keybindingsKeyboard(event) {
 // # KEYBOARD EVENTS: TOOLS - TODO LIST
 // -----------------------------------------------------------------------------------------------------------------
 
+const listItemHighlightClass = "list-highlight";
+
 function currentToDoList() {
   return document.activeElement.querySelector('.list[style*="display: flex"]');
+}
+
+function removeAllHighlights(listElement) {
+  const items = Array.from(listElement.querySelectorAll(".list-item"));
+  items.forEach((e) => e.classList.remove(listItemHighlightClass));
+}
+
+function selectAnotherItem(isDown) {
+  let highlighted = -1;
+  const items = Array.from(document.activeElement.querySelectorAll(".list-item")).map((e, i) => {
+    if (e.classList.contains(listItemHighlightClass)) {
+      highlighted = i;
+    }
+    e.classList.remove(listItemHighlightClass);
+    return [i, e];
+  });
+
+  let index = 0;
+  if (highlighted != -1) index = isDown ? (highlighted + 1) % items.length : highlighted - 1;
+  if (index < 0) index += items.length;
+  const element = items[index][1];
+  element.classList.add(listItemHighlightClass);
+  element.scrollIntoView({ block: "center", inline: "nearest" });
 }
 
 function keybindingsToDoList(event) {
@@ -316,20 +341,21 @@ function keybindingsToDoList(event) {
         scrollToCenter(todoSection);
       });
       break;
-    case "Enter":
-      break;
     case "ArrowDown":
     case "j":
+      selectAnotherItem(true);
       break;
     case "ArrowUp":
     case "k":
+      selectAnotherItem(false);
       break;
     case "/":
     case "s":
       controlledActivate(function () {
+        removeAllHighlights(document.activeElement);
         const input = document.activeElement.querySelector("input");
         input.focus();
-        todoMsg.innerText = todoMsgs[4];
+        todoMsg.innerText = todoMsgs[3];
       });
       break;
   }
@@ -444,8 +470,8 @@ document.addEventListener("keydown", (event) => {
           todoMsg.innerText = todoMsgs[2];
         }
       }
-      return;
     }
+    return;
   }
 
   // Keyboard Testing
@@ -764,14 +790,11 @@ const doneListSection = "Done";
 const todoMsgs = [
   "",
   "[T] Interact With List | [A-Z] Select List",
-  "[Esc] Exit | [Enter] Edit Selected Item | [j,Down] Select Item Below | [k,Up] Select Item Above" +
-    "\n[Alt + direction] Move Item Up/Down | [s,/] Enter Input Field",
-  "[Esc] Exit | [D] Move To Done | [X] Delete | [E] Edit",
+  "[Esc] Exit | [j,k,UP,DOWN] Select Item | <A-j,k,UP,DOWN> Move Item\n" +
+    " [D] Mark Done | [X] Delete | [s,/] Enter Input Field",
   "[Esc] Exit | [Enter] Add Item",
 ];
 const todoMsg = document.getElementById("todo-msg");
-
-function todoListMoveToDone(listId, index) {}
 
 function generateLI(listId, type, index, innerText) {
   const li = document.createElement("div");
@@ -779,7 +802,7 @@ function generateLI(listId, type, index, innerText) {
   li.className = "list-item";
 
   const indexor = document.createElement("span");
-  indexor.innerHTML = `[${index}]`;
+  indexor.innerText = "-";
   const text = document.createElement("span");
   text.innerText = innerText;
 
@@ -789,7 +812,7 @@ function generateLI(listId, type, index, innerText) {
 
   li.onclick = () => {
     if (type === todoListSection) {
-      todoListMoveToDone(listId, index);
+      moveToDoListItem(listId, index);
     } else if (type === doneListSection) {
     }
   };
@@ -823,7 +846,7 @@ function loadListFromEntry(index, entries, btnRow, divAllocation) {
   let title = `[${String.fromCharCode(index + 65)}] ${entries[index][0].replace("-todo-list", "")}`;
   const btn = document.createElement("button");
   btn.id = `${title}-btn`;
-  btn.title = `${entries[index][0]} button`;
+  btn.title = `${title} button`;
   btn.innerText = title;
   btn.type = "button";
   btn.style.color = index === 0 ? btnHighlight : btnDefault;
@@ -831,7 +854,7 @@ function loadListFromEntry(index, entries, btnRow, divAllocation) {
 
   // List contents
   const list = document.createElement("div");
-  list.id = `${title}-list`;
+  list.id = `${entries[index][0]}-list`;
   list.className = "list";
   list.style.display = index === 0 ? "flex" : "none";
 
@@ -869,6 +892,13 @@ function loadListFromEntry(index, entries, btnRow, divAllocation) {
   newEntryInput.type = "text";
   newEntryInput.placeholder = "Add";
   newEntryInput.className = "new-item";
+  newEntryInput.addEventListener("keydown", function (event) {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      const parent = document.activeElement.closest("section, .layout, .list");
+      addToDoListItem(parent.id.replace("-list-list", "-list"), newEntryInput.value);
+    }
+  });
   list.appendChild(newEntryInput);
 
   btn.onclick = () => {
@@ -929,7 +959,7 @@ function loadToDoLists() {
 function createToDoList(uniqueTitle, todos, dones) {
   const title = `${uniqueTitle}${todoListIdSuffix}`;
   let check = localStorage.getItem(title);
-  if (check) throw Error("This list already exists");
+  if (check) return;
   localStorage.setItem(
     title,
     JSON.stringify({
@@ -938,6 +968,24 @@ function createToDoList(uniqueTitle, todos, dones) {
     }),
   );
 }
+
+function addToDoListItem(listId, text) {
+  let cacheItem = localStorage.getItem(listId);
+  console.log(cacheItem, text);
+  // if (!cacheItem) return;
+  // cacheItem = JSON.parse(cacheItem);
+  // localStorage.setItem(
+  //   listId,
+  //   JSON.stringify({
+  //     todo: [...cacheItem.todo, text],
+  //     done: [...cacheItem.done],
+  //   }),
+  // );
+}
+
+function deleteToDoListItem(listId, section, index) {}
+
+function moveToDoListItem(listId, section, index) {}
 
 // -----------------------------------------------------------------------------------------------------------------
 // # STARTUP

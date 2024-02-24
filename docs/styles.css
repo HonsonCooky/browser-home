@@ -409,6 +409,10 @@ input:focus,
   font-size: 14px;
 }
 
+.list-highlight {
+  background: rgba(var(--surface0)) !important;
+}
+
 .list-item>span {
   margin: 0 2vw;
 }
