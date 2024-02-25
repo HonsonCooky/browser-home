@@ -322,6 +322,8 @@ function selectAnotherItem(isDown) {
     return [i, e];
   });
 
+  if (items.length === 0) return;
+
   let index = 0;
   if (highlighted != -1) index = isDown ? (highlighted + 1) % items.length : highlighted - 1;
   if (index < 0) index += items.length;
@@ -329,8 +331,6 @@ function selectAnotherItem(isDown) {
   element.classList.add(listItemHighlightClass);
   element.scrollIntoView({ block: "center", inline: "nearest" });
 }
-
-function moveItem(isDown) {}
 
 function keybindingsToDoList(event) {
   const controlledActivate = preventDefaultAction(event);
@@ -347,7 +347,7 @@ function keybindingsToDoList(event) {
     case "j":
       controlledActivate(function () {
         if (event.altKey) {
-          moveToDoListItem(true);
+          moveHighlightedToDoListItem(true);
         } else {
           selectAnotherItem(true);
         }
@@ -357,10 +357,21 @@ function keybindingsToDoList(event) {
     case "k":
       controlledActivate(function () {
         if (event.altKey) {
-          moveToDoListItem(false);
+          moveHighlightedToDoListItem(false);
         } else {
           selectAnotherItem(false);
         }
+      });
+      break;
+    case "d":
+    case "D":
+      controlledActivate(function () {
+        toggleDoneHighlightedToDoListItem();
+      });
+      break;
+    case "X":
+      controlledActivate(function () {
+        deleteHighlightedToDoItem();
       });
       break;
     case "/":
@@ -376,20 +387,46 @@ function keybindingsToDoList(event) {
 }
 
 function keybindingsToDo(event) {
+  const controlledActivate = preventDefaultAction(event);
   switch (event.key) {
     case "T":
-      const activeList = currentToDoList();
-      activeList.tabIndex = -1;
-      activeList.focus({ preventScroll: true });
-      todoMsg.innerText = todoMsgs[2];
+      controlledActivate(function () {
+        const activeList = currentToDoList();
+        activeList.tabIndex = -1;
+        activeList.focus({ preventScroll: true });
+        todoMsg.innerText = todoMsgs[2];
+      });
+      break;
+    case "X":
+      controlledActivate(function () {
+        const activeList = currentToDoList();
+        deleteToDoList(activeList.id.replace("-list-list", "-list"));
+      });
+      break;
+    case "/":
+    case "s":
+      controlledActivate(function () {
+        removeAllHighlights(document.activeElement);
+        const currentList = currentToDoList();
+        const input = currentList.querySelector("input");
+        input.focus();
+        todoMsg.innerText = todoMsgs[3];
+      });
       break;
     case "+":
-      document.getElementById("new-list").click();
+      controlledActivate(function () {
+        document.getElementById("new-list").click();
+        document.getElementById("new-list").scrollIntoView({ behavior: "smooth", block: "nearest", inline: "start" });
+      });
       break;
     default:
-      const element = document.activeElement.querySelector(`[id^="[${event.key}]"]`);
-      if (!element) break;
-      element.click();
+      controlledActivate(function () {
+        const element = document.activeElement.querySelector(`[id^="[${event.key}]"]`);
+        if (!element) return;
+        element.click();
+        element.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "start" });
+      });
+      break;
   }
 }
 
@@ -803,9 +840,9 @@ const todoListSection = "To Do";
 const doneListSection = "Done";
 const todoMsgs = [
   "",
-  "[T] Interact With List | [A-Z] Select List",
+  "[T] Interact With List | [A-Z] Select List | [D] Delete List",
   "[Esc] Exit | [j,k,UP,DOWN] Select Item | <A-j,k,UP,DOWN> Move Item\n" +
-    " [D] Mark Done | [X] Delete | [s,/] Enter Input Field",
+    " [D] Toggle Done | [X] Delete | [s,/] Enter Input Field",
   "[Esc] Exit | [Enter] Add Item",
 ];
 const todoMsg = document.getElementById("todo-msg");
@@ -826,7 +863,7 @@ function generateLI(listId, type, index, innerText) {
 
   li.onclick = () => {
     if (type === todoListSection) {
-      moveToDoListItem(listId, index);
+      moveHighlightedToDoListItem(listId, index);
     } else if (type === doneListSection) {
     }
   };
@@ -931,7 +968,7 @@ function initToDoSubSections(title, todos, dones) {
   return [todoDiv, doneDiv];
 }
 
-function initListFromEntry(index, title, content, btnRow, listViews) {
+function initListFromEntry(index, title, content) {
   const btnDefault = "rgba(var(--text))";
   const btnHighlight = "rgba(var(--teal))";
 
@@ -943,7 +980,6 @@ function initListFromEntry(index, title, content, btnRow, listViews) {
   btn.innerText = prettyTitle;
   btn.type = "button";
   btn.style.color = index === 0 ? btnHighlight : btnDefault;
-  btnRow.insertBefore(btn, document.getElementById("new-list"));
 
   // List contents
   const list = document.createElement("div");
@@ -960,6 +996,7 @@ function initListFromEntry(index, title, content, btnRow, listViews) {
   list.appendChild(newEntryInput);
 
   btn.onclick = () => {
+    document.getElementById("new-list").style.color = btnDefault;
     todoLists.forEach((b) => (b.style.color = btnDefault));
     listViews.forEach((d) => (d.style.display = "none"));
     btn.style.color = btnHighlight;
@@ -969,19 +1006,33 @@ function initListFromEntry(index, title, content, btnRow, listViews) {
   return [btn, list];
 }
 
-function initNewListButton(entries, listViews) {
+function initNewListButton() {
   const btnDefault = "rgba(var(--text))";
   const btnHighlight = "rgba(var(--teal))";
 
   // NEW LIST BUTTON
   const btn = document.getElementById("new-list");
-  todoLists.push(btn);
-  if (entries.length > 0) {
-    btn.style.flex = "none";
-  }
 
   const list = document.getElementById("new-list-view");
   list.style.display = "none";
+
+  const newListInput = document.getElementById("new-list-title");
+  newListInput.addEventListener("keydown", function (event) {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      createToDoList(newListInput.value);
+
+      // Highlight new list
+      const newListBtn = document.querySelector(`[id*="${newListInput.value}-btn"]`);
+      const listView = document.getElementById(`${newListInput.value}${todoListIdSuffix}-list`);
+      if (newListBtn && listView) {
+        newListBtn.click();
+        listView.tabIndex = -1;
+        listView.focus({ preventScroll: true });
+      }
+      newListInput.value = "";
+    }
+  });
 
   btn.onclick = () => {
     todoLists.forEach((b) => (b.style.color = btnDefault));
@@ -993,39 +1044,67 @@ function initNewListButton(entries, listViews) {
   return list;
 }
 
-const todoLists = [];
+let todoLists,
+  listViews = [];
+
 function initToDoLists() {
+  todoLists = [];
+  listViews = [];
+
   const header = "To Dos";
   const div = document.getElementById(`${header}-0`);
-  const cacheLists = getAllStorageLists();
+  Array.from(div.children)
+    .filter(
+      (item) =>
+        !(
+          item.classList.contains("header-container") ||
+          item.classList.contains("btn-row") ||
+          item.id === "new-list-view"
+        ),
+    )
+    .forEach((child) => div.removeChild(child));
 
   const btnRow = document.getElementById(`${header}-btn-row`);
-  const listViews = [];
+  Array.from(btnRow.children)
+    .filter((item) => item.id != "new-list")
+    .forEach((child) => {
+      btnRow.removeChild(child);
+    });
+
+  const cacheLists = getAllStorageLists();
   for (let e = 0; e < cacheLists.length; e++) {
     const [title, content] = cacheLists[e];
-    const [btn, list] = initListFromEntry(e, title, content, btnRow, listViews);
+    const [btn, list] = initListFromEntry(e, title, content);
     todoLists.push(btn);
     listViews.push(list);
   }
 
-  const newListView = initNewListButton(cacheLists, listViews);
+  const newListView = initNewListButton();
   listViews.push(newListView);
 
+  todoLists.forEach((btn) => btnRow.insertBefore(btn, document.getElementById("new-list")));
   listViews.forEach((d) => div.appendChild(d));
   todoSection.appendChild(div);
 }
 
-function createToDoList(uniqueTitle, todos, dones) {
+function createToDoList(uniqueTitle) {
+  if (uniqueTitle.length === 0) return;
   const title = `${uniqueTitle}${todoListIdSuffix}`;
   let check = localStorage.getItem(title);
   if (check) return;
   localStorage.setItem(
     title,
     JSON.stringify({
-      todo: todos,
-      done: dones,
+      todo: [],
+      done: [],
     }),
   );
+  initToDoLists();
+}
+
+function deleteToDoList(uniqueTitle) {
+  localStorage.removeItem(uniqueTitle);
+  initToDoLists();
 }
 
 function addToDoListItem(listId, text) {
@@ -1042,16 +1121,9 @@ function addToDoListItem(listId, text) {
   reloadList(listId);
 }
 
-function deleteToDoListItem(listId, section, index) {}
-
-function shiftElement(arr, oldIndex, newIndex) {
-  const item = arr.splice(oldIndex, 1)[0];
-  arr.splice(newIndex, 0, item);
-}
-
-function moveToDoListItem(isDown) {
+function getHighlightedElementInfo() {
   const highlighted = document.activeElement.querySelector(".list-item.list-highlight");
-  if (!highlighted) return;
+  if (!highlighted) throw Error("No Highlighted List Item");
 
   const info = highlighted.id.split("-");
   const listId = `${info[0]}-${info[1]}-${info[2]}`;
@@ -1059,20 +1131,72 @@ function moveToDoListItem(isDown) {
   const index = parseInt(info[info.length - 1]);
 
   let cacheItem = localStorage.getItem(listId);
-  if (!cacheItem) return;
+  if (!cacheItem) throw Error(`Can't find cache element with id ${listId}`);
   cacheItem = JSON.parse(cacheItem);
 
   const concernedArr = section === todoListSection ? cacheItem.todo : cacheItem.done;
-  let newIndex = isDown ? (index + 1) % concernedArr.length : index - 1;
-  if (newIndex < 0) newIndex += concernedArr.length;
-  shiftElement(concernedArr, index, newIndex);
+  const otherArr = section === todoListSection ? cacheItem.done : cacheItem.todo;
+  return { highlighted, info, listId, section, index, cacheItem, concernedArr, otherArr };
+}
 
-  localStorage.setItem(listId, JSON.stringify(cacheItem));
-  reloadList(listId);
-  const listItem = document.getElementById(`${info.slice(0, info.length - 1).join("-")}-${newIndex}`);
-  if (listItem) {
-    listItem.classList.add(listItemHighlightClass);
-    listItem.scrollIntoView({ block: "center", inline: "nearest" });
+function deleteHighlightedToDoItem() {
+  try {
+    let { info, listId, index, cacheItem, concernedArr } = getHighlightedElementInfo();
+    concernedArr = concernedArr.splice(index, 1);
+    localStorage.setItem(listId, JSON.stringify(cacheItem));
+    reloadList(listId);
+    const listItem = document.getElementById(`${info.slice(0, info.length - 1).join("-")}-${index}`);
+    if (listItem) {
+      listItem.classList.add(listItemHighlightClass);
+      listItem.scrollIntoView({ block: "center", inline: "nearest" });
+    }
+  } catch (e) {
+    console.error(e);
+    return;
+  }
+}
+
+function shiftElement(arr, oldIndex, newIndex) {
+  const item = arr.splice(oldIndex, 1)[0];
+  arr.splice(newIndex, 0, item);
+}
+
+function moveHighlightedToDoListItem(isDown) {
+  try {
+    const { info, listId, index, cacheItem, concernedArr } = getHighlightedElementInfo();
+    let newIndex = isDown ? (index + 1) % concernedArr.length : index - 1;
+    if (newIndex < 0) newIndex += concernedArr.length;
+    shiftElement(concernedArr, index, newIndex);
+
+    localStorage.setItem(listId, JSON.stringify(cacheItem));
+    reloadList(listId);
+    const listItem = document.getElementById(`${info.slice(0, info.length - 1).join("-")}-${newIndex}`);
+    if (listItem) {
+      listItem.classList.add(listItemHighlightClass);
+      listItem.scrollIntoView({ block: "center", inline: "nearest" });
+    }
+  } catch (e) {
+    console.error(e);
+    return;
+  }
+}
+
+function toggleDoneHighlightedToDoListItem() {
+  try {
+    let { listId, section, index, cacheItem, concernedArr, otherArr } = getHighlightedElementInfo();
+    otherArr.push(concernedArr[index]);
+    concernedArr = concernedArr.splice(index, 1);
+    localStorage.setItem(listId, JSON.stringify(cacheItem));
+    reloadList(listId);
+    const otherSection = section === todoListSection ? doneListSection : todoListSection;
+    const listItem = document.getElementById(`${listId}-list-${otherSection}-${otherArr.length - 1}`);
+    if (listItem) {
+      listItem.classList.add(listItemHighlightClass);
+      listItem.scrollIntoView({ block: "center", inline: "nearest" });
+    }
+  } catch (e) {
+    console.error(e);
+    return;
   }
 }
 
@@ -1082,10 +1206,6 @@ function moveToDoListItem(isDown) {
 window.scrollTo(0, 0);
 window.addEventListener("resize", function () {
   toPage(currentPageIndex(), true);
-});
-window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", ({ matches }) => {
-  setFavicon();
-  setHomeIcon();
 });
 
 // try {
