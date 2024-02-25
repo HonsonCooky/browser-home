@@ -1215,4 +1215,4 @@ window.addEventListener("resize", function () {
 // }
 
 initToDoLists();
-toPage(1);
+toPage(0);
