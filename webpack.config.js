@@ -3,9 +3,12 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 module.exports = {
   mode: "development",
-  entry: "./src/scripts.js",
+  entry: {
+    home: "./src/scripts.js",
+    edge: "./src/pages/edge/scripts.js",
+  },
   output: {
-    filename: "bundle.js",
+    filename: "[name]/bundle.js",
     path: path.resolve(__dirname, "docs"),
   },
   module: {
@@ -26,7 +29,16 @@ module.exports = {
   },
   plugins: [
     new HtmlWebpackPlugin({
+      title: "Home",
+      filename: "index.html",
       template: "./src/index.html",
+      chunks: ["home"],
+    }),
+    new HtmlWebpackPlugin({
+      title: "Edge",
+      filename: "edge/index.html",
+      template: "./src/pages/edge/index.html",
+      chunks: ["edge"],
     }),
   ],
   devServer: {
