@@ -4,7 +4,7 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 module.exports = {
   mode: "development",
   entry: {
-    home: "./src/scripts.js",
+    ".": "./src/pages/home/scripts.js",
     edge: "./src/pages/edge/scripts.js",
   },
   output: {
@@ -31,8 +31,8 @@ module.exports = {
     new HtmlWebpackPlugin({
       title: "Home",
       filename: "index.html",
-      template: "./src/index.html",
-      chunks: ["home"],
+      template: "./src/pages/home/index.html",
+      chunks: ["."],
     }),
     new HtmlWebpackPlugin({
       title: "Edge",
