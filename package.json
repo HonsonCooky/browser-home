@@ -2,12 +2,22 @@
   "name": "browser-home",
   "version": "1.0.0",
   "description": "",
-  "main": "./docs/index.html",
+  "private": true,
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "scripts": {
+    "build": "webpack",
+    "serve": "webpack serve"
+  },
   "devDependencies": {
+    "css-loader": "^6.10.0",
+    "html-webpack-plugin": "^5.6.0",
     "prettier": "^3.2.4",
-    "prettier-plugin-css-order": "^2.0.1"
+    "prettier-plugin-css-order": "^2.0.1",
+    "style-loader": "^3.3.4",
+    "webpack": "^5.90.3",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^5.0.2"
   }
 }
