@@ -24,7 +24,7 @@ img {
 
 h4 {
   margin: 0 0 2vh 0;
-  color: rgba(var(--lavender), 0.4);
+  color: rgba(var(--teal));
   font-style: italic;
   font-weight: 100;
   font-size: 20px;
@@ -49,12 +49,18 @@ ul {
   list-style: none;
 }
 
-li>span {
-  color: rgba(var(--blue));
+li > span {
+  color: rgba(var(--green));
+}
+
+li,
+i {
+  color: rgba(var(--green), 0.7);
 }
 
 li:not(:first-child):before {
   padding: 0 10px;
   content: "|";
-  color: rgba(var(--green));
+  color: rgba(var(--text));
+  font-weight: 800;
 }

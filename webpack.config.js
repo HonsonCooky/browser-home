@@ -2,7 +2,7 @@ const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 module.exports = {
-  mode: "development",
+  mode: "production",
   entry: {
     ".": "./src/pages/home/scripts.js",
     edge: "./src/pages/edge/scripts.js",

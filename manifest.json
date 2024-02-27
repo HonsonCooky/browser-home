@@ -1,17 +1,19 @@
 {
   "manifest_version": 3,
   "name": "HonsonCooky Browser Homepage",
+  "short_name": "HC-Home",
   "version": "1.0.0",
   "description": "A custom homepage for edge that adds tools and helpful information.",
+  "permissions": ["favicon"],
   "chrome_settings_overrides": {
-    "homepage": "https://browser.github.honsoncooky.dev",
-    "startup_pages": ["https://browser.github.honsoncooky.dev"]
+    "homepage": "https://browser.honsoncooky.dev",
+    "startup_pages": ["https://browser.honsoncooky.dev"]
   },
   "chrome_url_overrides": {
     "newtab": "./docs/index.html"
   },
   "icons": {
-    "48": "./docs/assets/HC_LOGO_LIGHT_48x48.png",
-    "128": "./docs/assets/HC_LOGO_LIGHT_128x128.png"
+    "48": "./src/assets/HC_LOGO_LIGHT_48x48.png",
+    "128": "./src/assets/HC_LOGO_LIGHT_128x128.png"
   }
 }
