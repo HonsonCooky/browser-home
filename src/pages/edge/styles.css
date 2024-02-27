@@ -1,1 +1,45 @@
 @import url("../../global/styles.css");
+
+header {
+  display: flex;
+  flex-direction: column;
+  gap: 2vh;
+  padding: 1vh 2vw;
+}
+
+.row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+img {
+  width: auto;
+  height: 100px;
+}
+
+ul {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+li>span {
+  color: rgba(var(--green));
+}
+
+li,
+i {
+  color: rgba(var(--green), 0.7);
+  font-size: 16px;
+}
+
+li:not(:first-child):before {
+  padding: 0 10px;
+  content: "|";
+  color: rgba(var(--text));
+  font-weight: 800;
+}

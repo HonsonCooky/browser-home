@@ -10,6 +10,7 @@ module.exports = {
   output: {
     filename: "[name]/bundle.js",
     path: path.resolve(__dirname, "docs"),
+    clean: true,
   },
   module: {
     rules: [
@@ -32,12 +33,18 @@ module.exports = {
       title: "Home",
       filename: "index.html",
       template: "./src/pages/home/index.html",
+      inject: "head",
+      favicon: "./src/assets/HC_LOGO_LIGHT_48x48.png",
+      scriptLoading: "blocking",
       chunks: ["."],
     }),
     new HtmlWebpackPlugin({
       title: "Edge",
       filename: "edge/index.html",
       template: "./src/pages/edge/index.html",
+      inject: "head",
+      favicon: "./src/assets/HC_LOGO_LIGHT_48x48.png",
+      scriptLoading: "blocking",
       chunks: ["edge"],
     }),
   ],

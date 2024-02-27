@@ -21,6 +21,10 @@
   background: rgba(var(--crust));
 }
 
+*:focus {
+  border: 2px dotted rgba(var(--lavender)) !important;
+}
+
 html,
 body {
   display: flex;
@@ -37,4 +41,21 @@ h1 {
   margin: 1vh 2vw;
   font-weight: 800;
   font-size: 80px;
+}
+
+input {
+  outline: none;
+  border: 2px solid rgba(var(--crust));
+  border-radius: 100vh;
+  background: rgba(var(--mantle));
+  padding: 0.5vh 2vw;
+  height: 16px;
+  color: rgba(var(--text));
+  font-weight: 200;
+  font-size: 14px;
+}
+
+input::-webkit-input-placeholder {
+  color: rgba(var(--text), 0.8);
+  font-size: 14px;
 }
