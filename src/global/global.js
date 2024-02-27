@@ -19,6 +19,10 @@ window.addEventListener("load", function () {
   ]);
 
   window.addEventListener("keydown", function (event) {
+    if (document.activeElement.tagName === "INPUT") {
+      return;
+    }
+
     // JUMP TO PAGE
     if (internalPages.has(event.key)) {
       if (window.origin.includes("extension")) {
@@ -50,6 +54,12 @@ window.addEventListener("load", function () {
       case "u":
         window.scrollBy({ top: -window.innerHeight, behavior: "smooth" });
         break;
+      case "/":
+        const input = document.body.querySelector("input");
+        if (input) {
+          event.preventDefault();
+          input.focus({ preventScroll: true });
+        }
     }
   });
 });
@@ -133,6 +143,11 @@ export function implementSearchBox(searchBox, searchElement) {
       } else {
         findNext(this.value);
       }
+    }
+
+    if (event.key === "Escape") {
+      event.preventDefault();
+      document.activeElement.blur();
     }
   });
   return searchBox;

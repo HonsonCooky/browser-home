@@ -8,7 +8,7 @@
   "license": "ISC",
   "scripts": {
     "build": "webpack && pnpm run copy",
-    "copy": "pwsh -c Copy-Item ./.docs-important/.nojekyll ./docs && pwsh -c Copy-Item ./.docs-important/CNAME ./docs",
+    "copy": "pwsh -c Copy-Item ./.docs-keep/.nojekyll ./docs && pwsh -c Copy-Item ./.docs-keep/CNAME ./docs",
     "serve": "webpack serve"
   },
   "devDependencies": {

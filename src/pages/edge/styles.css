@@ -40,6 +40,6 @@ i {
 li:not(:first-child):before {
   padding: 0 10px;
   content: "|";
-  color: rgba(var(--text));
+  color: rgba(var(--green));
   font-weight: 800;
 }
