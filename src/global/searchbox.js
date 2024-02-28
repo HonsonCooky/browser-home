@@ -1,69 +1,3 @@
-import logoImg from "../assets/HC_LOGO_LIGHT_128x128.png";
-window.addEventListener("load", function () {
-  //-----------------------------
-  // LOAD LOGOS
-  //-----------------------------
-  Array.from(document.querySelectorAll(".logo")).forEach((i) => (i.src = logoImg));
-
-  //-----------------------------
-  // GLOBAL KEY BINDINGS
-  //-----------------------------
-  const internalPages = new Map([
-    ["Home", ""],
-    [("c", "canvas/")],
-    ["e", "edge/"],
-    ["l", "keyboard/"],
-    ["t", "todo/"],
-    ["v", "vim/"],
-    ["w", "vimium/"],
-  ]);
-
-  window.addEventListener("keydown", function (event) {
-    if (document.activeElement.tagName === "INPUT") {
-      return;
-    }
-
-    // JUMP TO PAGE
-    if (internalPages.has(event.key)) {
-      if (window.origin.includes("extension")) {
-        const scripts = document.getElementsByTagName("script");
-        const currentScriptSrc = scripts[scripts.length - 1].src;
-        window.location.href = currentScriptSrc.replace(/docs.*/, `docs/${internalPages.get(event.key)}index.html`);
-      } else {
-        window.location.href = `${window.location.origin}/${internalPages.get(event.key)}`;
-      }
-      return;
-    }
-
-    switch (event.key) {
-      case "H":
-        window.history.back();
-        break;
-      case "L":
-        window.history.forward();
-        break;
-      case "j":
-        window.scrollBy({ top: 50, behavior: "smooth" });
-        break;
-      case "k":
-        window.scrollBy({ top: -50, behavior: "smooth" });
-        break;
-      case "d":
-        window.scrollBy({ top: window.innerHeight, behavior: "smooth" });
-        break;
-      case "u":
-        window.scrollBy({ top: -window.innerHeight, behavior: "smooth" });
-        break;
-      case "/":
-        const input = document.body.querySelector("input");
-        if (input) {
-          event.preventDefault();
-          input.focus({ preventScroll: true });
-        }
-    }
-  });
-});
-
 export function implementSearchBox(searchBox, searchElement) {
   let currentIndex = -1;
   let matches = [];
@@ -134,7 +68,7 @@ export function implementSearchBox(searchBox, searchElement) {
     }
   }
 
-  searchBox.addEventListener("keydown", function (event) {
+  searchBox.addEventListener("keydown", function(event) {
     if (event.key === "Enter") {
       event.preventDefault();
       if (this.value != prevQuery) searchChildren(searchElement, this.value, 0);

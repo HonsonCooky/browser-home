@@ -6,20 +6,7 @@ body {
 }
 
 header {
-  display: flex;
-  flex-direction: column;
   align-items: center;
-}
-
-.row {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-}
-
-img {
-  width: auto;
-  height: 100px;
 }
 
 h4 {
@@ -28,40 +15,4 @@ h4 {
   font-style: italic;
   font-weight: 100;
   font-size: 20px;
-}
-
-main {
-  display: flex;
-  row-gap: 4vh;
-  flex-direction: column;
-  justify-content: center;
-  margin-top: 10vh;
-  padding: 0 10vw;
-}
-
-ul {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  justify-content: center;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-li>span {
-  color: rgba(var(--green));
-}
-
-li,
-i {
-  color: rgba(var(--green), 0.7);
-  font-size: 16px;
-}
-
-li:not(:first-child):before {
-  padding: 0 10px;
-  content: "|";
-  color: rgba(var(--text));
-  font-weight: 800;
 }
