@@ -1,36 +1,75 @@
+let keymaps = {
+  i: {
+    name: "Internal Links",
+    h: { name: "Home", action: () => internalPageJump("/") },
+    c: { name: "Canvas", action: () => internalPageJump("/canvas/") },
+    d: { name: "Dev Tools", action: () => internalPageJump("/dev-tools/") },
+    e: { name: "Edge Shortcuts", action: () => internalPageJump("/edge/") },
+    l: { name: "Keyboard Layout", action: () => internalPageJump("/layout/") },
+    t: { name: "Todo Lists", action: () => internalPageJump("/todo/") },
+    v: { name: "Vim Shortcuts", action: () => internalPageJump("/vim/") },
+    w: { name: "Vimium Shortcuts", action: () => internalPageJump("/vimium/") },
+  },
+  e: {
+    name: "External Links",
+    a: { name: "Advent of Code", action: () => externalPageJump("https://adventofcode.com") },
+    c: { name: "Calendar", action: () => externalPageJump("https://calendar.google.com") },
+    d: { name: "Disney+", action: () => externalPageJump("https://www.disneyplus.com/search") },
+    e: { name: "Exercism", action: () => externalPageJump("https://exercism.org") },
+    g: { name: "GitHub", action: () => externalPageJump("https://github.com/HonsonCooky") },
+    h: { name: "Gmail", action: () => externalPageJump("https://mail.google.com") },
+    m: { name: "Messenger", action: () => externalPageJump("https://www.messenger.com") },
+    n: { name: "Netflix", action: () => externalPageJump("https://www.netflix.com/browse") },
+    o: { name: "Neon", action: () => externalPageJump("https://www.neontv.co.nz") },
+    r: { name: "Reddit", action: () => externalPageJump("https://www.reddit.com") },
+    s: { name: "Stack Overflow", action: () => externalPageJump("https://stackoverflow.com") },
+    t: { name: "Snapchat", action: () => externalPageJump("https://web.snapchat.com") },
+    y: { name: "Youtube", action: () => externalPageJump("https://www.youtube.com/") },
+  },
+};
+
+export function addKeybinding({ keyPath, name, action }) {
+  if (!keyPath || !name) return;
+  const keyPathSplit = keyPath.split(".");
+  const nameSplit = name.split(".");
+  let keybinding = keymaps;
+  for (const [k, i] of keyPathSplit.map((item, i) => [item, i])) {
+    if (!keybinding[k]) {
+      keybinding[k] = { name: nameSplit[i] ? nameSplit[i] : nameSplit[nameSplit.length - 1] };
+      if (i === keyPathSplit.length - 1) keybinding[k].action = action;
+    }
+    keybinding = keybinding[k];
+  }
+}
+
+export function focusElement(elementIdentifer, index) {
+  let element = document.getElementById(elementIdentifer);
+  if (!element) element = document.querySelector(elementIdentifer);
+  if (index) element = document.querySelectorAll(elementIdentifer).item(index);
+
+  element.tabIndex = -1;
+  element.focus({ preventScroll: true });
+  element.scrollIntoView();
+}
+
+function internalPageJump(url) {
+  if (window.origin.includes("extension")) {
+    const scripts = document.getElementsByTagName("script");
+    const currentScriptSrc = scripts[scripts.length - 1].src;
+    window.location.href = currentScriptSrc.replace(/docs.*/, `docs${url}index.html`);
+  } else {
+    window.location.href = `${window.location.origin}${url}`;
+  }
+}
+
+function externalPageJump(url) {
+  window.location.href = url;
+}
+
 export function loadGlobalKeybindings() {
   const leader = " ";
   const whichKeyId = "which-key";
   let currentKeySequence = [];
-  const keymaps = {
-    i: {
-      name: "Internal Links",
-      h: { name: "Home", action: () => internalPageJump("/") },
-      c: { name: "Canvas", action: () => internalPageJump("/canvas/") },
-      d: { name: "Dev Tools", action: () => internalPageJump("/dev-tools/") },
-      e: { name: "Edge Shortcuts", action: () => internalPageJump("/edge/") },
-      l: { name: "Keyboard Layout", action: () => internalPageJump("/layout/") },
-      t: { name: "Todo Lists", action: () => internalPageJump("/todo/") },
-      v: { name: "Vim Shortcuts", action: () => internalPageJump("/vim/") },
-      w: { name: "Vimium Shortcuts", action: () => internalPageJump("/vimium/") },
-    },
-    e: {
-      name: "External Links",
-      a: { name: "Advent of Code", action: () => externalPageJump("https://adventofcode.com") },
-      c: { name: "Calendar", action: () => externalPageJump("https://calendar.google.com") },
-      d: { name: "Disney+", action: () => externalPageJump("https://www.disneyplus.com/search") },
-      e: { name: "Exercism", action: () => externalPageJump("https://exercism.org") },
-      g: { name: "GitHub", action: () => externalPageJump("https://github.com/HonsonCooky") },
-      h: { name: "Gmail", action: () => externalPageJump("https://mail.google.com") },
-      m: { name: "Messenger", action: () => externalPageJump("https://www.messenger.com") },
-      n: { name: "Netflix", action: () => externalPageJump("https://www.netflix.com/browse") },
-      o: { name: "Neon", action: () => externalPageJump("https://www.neontv.co.nz") },
-      r: { name: "Reddit", action: () => externalPageJump("https://www.reddit.com") },
-      s: { name: "Stack Overflow", action: () => externalPageJump("https://stackoverflow.com") },
-      t: { name: "Snapchat", action: () => externalPageJump("https://web.snapchat.com") },
-      y: { name: "Youtube", action: () => externalPageJump("https://www.youtube.com/") },
-    },
-  };
 
   function showKeyBindings(currentKeyMap) {
     let whichKey = document.getElementById(whichKeyId);
@@ -60,20 +99,6 @@ export function loadGlobalKeybindings() {
     if (whichKey) {
       document.body.removeChild(whichKey);
     }
-  }
-
-  function internalPageJump(url) {
-    if (window.origin.includes("extension")) {
-      const scripts = document.getElementsByTagName("script");
-      const currentScriptSrc = scripts[scripts.length - 1].src;
-      window.location.href = currentScriptSrc.replace(/docs.*/, `docs${url}index.html`);
-    } else {
-      window.location.href = `${window.location.origin}${url}`;
-    }
-  }
-
-  function externalPageJump(url) {
-    window.location.href = url;
   }
 
   function keySequence(event) {

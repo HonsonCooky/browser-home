@@ -1,0 +1,44 @@
+@import url("../../global/styles.css");
+
+h1 {
+  font-size: 60px;
+}
+
+h4 {
+  font-size: 14px;
+}
+
+main {
+  display: flex;
+  flex-direction: column;
+  gap: 10vh;
+}
+
+#json-to-html {
+  display: flex;
+  flex-direction: column;
+  gap: 2vh;
+  padding: 0 4vw;
+}
+
+#json-to-html div {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+#json-to-html textarea {
+  outline: none;
+  border-radius: 2vh 2vh 0 0;
+  background: rgba(var(--overlay0));
+  padding: 2vh;
+  height: 18vh;
+}
+
+#json-to-html button {
+  outline: none;
+  border: none;
+  border-radius: 0 0 2vh 2vh;
+  background: rgba(var(--crust));
+  height: 30px;
+}

@@ -39,8 +39,11 @@ body {
 
 header {
   display: flex;
+  position: sticky;
+  top: 0;
   flex-direction: column;
   gap: 2vh;
+  background: rgba(var(--base));
   padding: 1vh 2vw;
 }
 
@@ -132,4 +135,13 @@ input::-webkit-input-placeholder {
 
 .code-builtin {
   color: rgba(var(--peach));
+}
+
+.marked {
+  background: rgba(var(--yellow), 0.2) !important;
+}
+
+.marked-highlight {
+  color: rgba(var(--yellow));
+  font-weight: 800;
 }

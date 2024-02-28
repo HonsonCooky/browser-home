@@ -6,6 +6,7 @@ module.exports = {
   entry: {
     ".": "./src/pages/home/scripts.js",
     edge: "./src/pages/edge/scripts.js",
+    "dev-tools": "./src/pages/dev-tools/scripts.js",
   },
   output: {
     filename: "[name]/bundle.js",
@@ -46,6 +47,15 @@ module.exports = {
       favicon: "./src/assets/HC_LOGO_LIGHT_48x48.png",
       scriptLoading: "blocking",
       chunks: ["edge"],
+    }),
+    new HtmlWebpackPlugin({
+      title: "DevTools",
+      filename: "dev-tools/index.html",
+      template: "./src/pages/dev-tools/index.html",
+      inject: "head",
+      favicon: "./src/assets/HC_LOGO_LIGHT_48x48.png",
+      scriptLoading: "blocking",
+      chunks: ["dev-tools"],
     }),
   ],
   devServer: {
