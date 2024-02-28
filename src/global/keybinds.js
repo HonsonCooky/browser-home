@@ -4,31 +4,31 @@ export function loadGlobalKeybindings() {
   let currentKeySequence = [];
   const keymaps = {
     i: {
-      name: "[I]nternal Links",
-      h: { name: "[Home]", url: "/" },
-      c: { name: "[C]anvas", url: "/canvas/" },
-      d: { name: "[D]ev tools", url: "/dev-tools/" },
-      l: { name: "[K]eyboard Layout", url: "/layout/" },
-      t: { name: "[T]odo", url: "/todo/" },
-      e: { name: "[E]dge Shortcuts", url: "/edge/" },
-      v: { name: "[v]im Shortcuts", url: "/vim/" },
-      w: { name: "[W] Vimium Shortcuts", url: "/vimium/" },
+      name: "Internal Links",
+      h: { name: "Home", action: () => internalPageJump("/") },
+      c: { name: "Canvas", action: () => internalPageJump("/canvas/") },
+      d: { name: "Dev Tools", action: () => internalPageJump("/dev-tools/") },
+      e: { name: "Edge Shortcuts", action: () => internalPageJump("/edge/") },
+      l: { name: "Keyboard Layout", action: () => internalPageJump("/layout/") },
+      t: { name: "Todo Lists", action: () => internalPageJump("/todo/") },
+      v: { name: "Vim Shortcuts", action: () => internalPageJump("/vim/") },
+      w: { name: "Vimium Shortcuts", action: () => internalPageJump("/vimium/") },
     },
     e: {
-      name: "[E]xternal Links",
-      a: { name: "[A]dvent of Code", url: "https://adventofcode.com" },
-      c: { name: "[C]alendar", url: "https://calendar.google.com" },
-      d: { name: "[D]isney+", url: "https://www.disneyplus.com/search" },
-      e: { name: "[E]xercism", url: "https://exercism.org" },
-      g: { name: "[G]itHub", url: "https://github.com/HonsonCooky" },
-      h: { name: "[H] Gmail", url: "https://mail.google.com" },
-      m: { name: "[M]essenger", url: "https://www.messenger.com" },
-      n: { name: "[N]etflix", url: "https://www.netflix.com/browse" },
-      o: { name: "[O] Neon", url: "https://www.neontv.co.nz" },
-      r: { name: "[R]eddit", url: "https://www.reddit.com" },
-      s: { name: "[S]tack Overflow", url: "https://stackoverflow.com" },
-      t: { name: "[T] Snapchat", url: "https://web.snapchat.com" },
-      y: { name: "[Y]outube", url: "https://www.youtube.com/" },
+      name: "External Links",
+      a: { name: "Advent of Code", action: () => externalPageJump("https://adventofcode.com") },
+      c: { name: "Calendar", action: () => externalPageJump("https://calendar.google.com") },
+      d: { name: "Disney+", action: () => externalPageJump("https://www.disneyplus.com/search") },
+      e: { name: "Exercism", action: () => externalPageJump("https://exercism.org") },
+      g: { name: "GitHub", action: () => externalPageJump("https://github.com/HonsonCooky") },
+      h: { name: "Gmail", action: () => externalPageJump("https://mail.google.com") },
+      m: { name: "Messenger", action: () => externalPageJump("https://www.messenger.com") },
+      n: { name: "Netflix", action: () => externalPageJump("https://www.netflix.com/browse") },
+      o: { name: "Neon", action: () => externalPageJump("https://www.neontv.co.nz") },
+      r: { name: "Reddit", action: () => externalPageJump("https://www.reddit.com") },
+      s: { name: "Stack Overflow", action: () => externalPageJump("https://stackoverflow.com") },
+      t: { name: "Snapchat", action: () => externalPageJump("https://web.snapchat.com") },
+      y: { name: "Youtube", action: () => externalPageJump("https://www.youtube.com/") },
     },
   };
 
@@ -37,6 +37,20 @@ export function loadGlobalKeybindings() {
     if (!whichKey) {
       whichKey = document.createElement("div");
       whichKey.id = whichKeyId;
+      document.body.appendChild(whichKey);
+    } else {
+      whichKey.innerHTML = "";
+    }
+
+    for (const [key, value] of Object.entries(currentKeyMap)) {
+      if (!value.name) continue;
+      const div = document.createElement("div");
+      if (!value.action) {
+        div.classList.add("folder");
+      }
+      div.id = key;
+      div.innerHTML = `<span>${key} <i class="nf nf-oct-arrow_right"></i> </span>${value.name}`;
+      whichKey.appendChild(div);
     }
   }
 
@@ -44,7 +58,7 @@ export function loadGlobalKeybindings() {
     currentKeySequence = [];
     const whichKey = document.getElementById(whichKeyId);
     if (whichKey) {
-      document.removeChild(whichKey);
+      document.body.removeChild(whichKey);
     }
   }
 
@@ -62,33 +76,31 @@ export function loadGlobalKeybindings() {
     window.location.href = url;
   }
 
-  function evaluateKeymap(keymap) {
-    if (typeof keymap.url === "string") {
-      keymap.url.startsWith("https://") ? externalPageJump(keymap.url) : internalPageJump(keymap.url);
-    }
-  }
-
   function keySequence(event) {
     event.preventDefault();
-    currentKeySequence.push(event.key.toLowerCase());
-    if (currentKeySequence < 2) return;
+
+    if (event.key === "Backspace") {
+      currentKeySequence.pop();
+    } else {
+      currentKeySequence.push(event.key.toLowerCase());
+    }
 
     let currentKeyMap = keymaps;
     for (const c of currentKeySequence.slice(1)) {
       currentKeyMap = currentKeyMap[c];
+    }
 
-      if (!currentKeyMap) {
-        clearKeySequence();
-        return;
-      }
+    if (!currentKeyMap) {
+      clearKeySequence();
+      return;
+    }
 
-      if (currentKeyMap.url) {
-        evaluateKeymap(currentKeyMap);
-        clearKeySequence();
-        return;
-      } else {
-        showKeyBindings(currentKeyMap);
-      }
+    if (currentKeyMap.action) {
+      currentKeyMap.action();
+      clearKeySequence();
+      return;
+    } else {
+      showKeyBindings(currentKeyMap);
     }
   }
 

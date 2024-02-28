@@ -44,15 +44,22 @@ header {
   padding: 1vh 2vw;
 }
 
-img {
-  width: auto;
-  height: 100px;
-}
-
 h1 {
   margin: 1vh 2vw;
   font-weight: 800;
   font-size: 80px;
+}
+
+h4 {
+  margin: 0 0 2vh 0;
+  font-style: italic;
+  font-weight: 100;
+  font-size: 20px;
+}
+
+img {
+  width: auto;
+  height: 100px;
 }
 
 input {
@@ -76,4 +83,53 @@ input::-webkit-input-placeholder {
   display: flex;
   flex-direction: row;
   align-items: center;
+}
+
+#which-key {
+  display: grid;
+  position: fixed;
+  bottom: 2vh;
+  left: 50%;
+  grid-template-columns: auto auto auto;
+  transform: translate(-50%, 0);
+  border-radius: 2vh;
+  background: rgba(var(--crust));
+  padding: 1vh 2vw;
+  width: 80%;
+}
+
+#which-key span {
+  color: rgba(var(--blue));
+}
+
+#which-key i {
+  color: rgba(var(--surface2));
+}
+
+#which-key div {
+  color: rgba(var(--mauve));
+}
+
+#which-key .folder {
+  color: rgba(var(--peach));
+}
+
+.code-key {
+  color: rgba(var(--mauve));
+}
+
+.code-fn {
+  color: rgba(var(--blue));
+}
+
+.code-import {
+  color: rgba(var(--lavender));
+}
+
+.code-str {
+  color: rgba(var(--green));
+}
+
+.code-builtin {
+  color: rgba(var(--peach));
 }
