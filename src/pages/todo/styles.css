@@ -1,0 +1,24 @@
+@import url("../../global/styles.css");
+
+.list {
+  flex-direction: column;
+  border-radius: 1vh;
+}
+
+.list-item {
+  display: flex;
+  flex: 1;
+  flex-direction: row;
+  align-items: center;
+  padding: 0.2vh 4vw;
+  font-weight: 300;
+  font-size: 16px;
+}
+
+.list-highlight {
+  background: rgba(var(--surface0)) !important;
+}
+
+.list-item>span {
+  margin: 0 2vw;
+}

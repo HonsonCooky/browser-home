@@ -8,6 +8,7 @@ module.exports = {
     "dev-tools": "./src/pages/dev-tools/scripts.js",
     edge: "./src/pages/edge/scripts.js",
     layout: "./src/pages/layout/scripts.js",
+    todo: "./src/pages/todo/scripts.js",
     vim: "./src/pages/vim/scripts.js",
     vimium: "./src/pages/vimium/scripts.js",
   },
@@ -68,6 +69,15 @@ module.exports = {
       favicon: "./src/assets/HC_LOGO_LIGHT_48x48.png",
       scriptLoading: "blocking",
       chunks: ["layout"],
+    }),
+    new HtmlWebpackPlugin({
+      title: "To Do List",
+      filename: "todo/index.html",
+      template: "./src/pages/todo/index.html",
+      inject: "head",
+      favicon: "./src/assets/HC_LOGO_LIGHT_48x48.png",
+      scriptLoading: "blocking",
+      chunks: ["todo"],
     }),
     new HtmlWebpackPlugin({
       title: "Vim",
