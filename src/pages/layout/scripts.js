@@ -3,8 +3,8 @@ import "./styles.css";
 import layoutJson from "../../assets/keyboard-layout.json";
 import { addKeybinding } from "../../global/keybinds";
 
-window.addEventListener("load", function() {
-  const keyboardSection = document.getElementById("keyboard-layout");
+window.addEventListener("load", function () {
+  const keyboardSection = document.getElementById("keyboard-layouts");
 
   function loadKeyboardKeys(keyboardLayout, tIndex, rows, cols, titles, content) {
     for (let i = 0; i < rows; i++) {
@@ -46,9 +46,7 @@ window.addEventListener("load", function() {
     }
   }
 
-  function createKeyboardLayout(header, data) {
-    const div = document.getElementById(`${header}-0`);
-
+  function createKeyboardLayout(data) {
     const { layers, titles } = data;
     const { meta, ...content } = layers;
     const [rows, cols] = meta.size.split("x").map(Number);
@@ -72,7 +70,7 @@ window.addEventListener("load", function() {
 
       loadKeyboardKeys(layout, t, rows, cols, titles, content);
 
-      div.appendChild(layout);
+      keyboardSection.appendChild(layout);
 
       btn.onclick = () => {
         document.querySelectorAll('[id^="keyboard-select-btn-"]').forEach((b) => {
@@ -85,8 +83,6 @@ window.addEventListener("load", function() {
         layout.style.display = "grid";
       };
     }
-
-    return div;
   }
 
   let keyboardData = {};
@@ -94,7 +90,7 @@ window.addEventListener("load", function() {
     .then((response) => response.json())
     .then((data) => {
       keyboardData = data;
-      keyboardSection.appendChild(createKeyboardLayout("Keyboard Layout", data));
+      createKeyboardLayout(data);
     });
 
   addKeybinding({
@@ -249,7 +245,7 @@ window.addEventListener("load", function() {
     }
   });
 
-  window.addEventListener("keydown", function(event) {
+  window.addEventListener("keydown", function (event) {
     if (this.document.activeElement.classList.contains("layout")) {
       keybindingsKeyboardLayout(event);
     }

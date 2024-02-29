@@ -1,74 +1,49 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link id="favicon" rel="icon" type="image/x-icon" />
-    <title>New Tab: Keyboard</title>
-  </head>
 
-  <body>
-    <header>
-      <div class="row">
-        <img class="logo" alt="HC_LOGO" />
-        <h1>Keyboard Layout</h1>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link id="favicon" rel="icon" type="image/x-icon" />
+  <title>New Tab: Keyboard</title>
+</head>
+
+<body>
+  <header>
+    <div class="row">
+      <img class="logo" alt="HC_LOGO" />
+      <h1>Keyboard Layout</h1>
+    </div>
+    <h4>An interactive tool for my custom keyboard layout</h4>
+  </header>
+  <main>
+    <div id="keyboard-details">
+      <div><span class="detail-title">Keyboard:</span> ZSA's PLANCK EZ</div>
+      <div><span class="detail-title">Layout:</span> QWERTY</div>
+    </div>
+    <div id="keyboard-layouts">
+      <div id="keyboard-layout-btn-row" class="btn-row">
+        <button id="keyboard-select-btn-0" title="Base layer button" type="button" style="color: rgba(var(--teal))">
+          [B]ase
+        </button>
+        <button id="keyboard-select-btn-1" title="Lower layer button" type="button" style="color: rgba(var(--text))">
+          [L]ower
+        </button>
+        <button id="keyboard-select-btn-2" title="Raise layer button" type="button" style="color: rgba(var(--text))">
+          [R]aise
+        </button>
+        <button id="keyboard-select-btn-3" title="Adjust layer button" type="button" style="color: rgba(var(--text))">
+          [A]djust
+        </button>
+        <button id="keyboard-select-btn-4" title="Mouse layer button" type="button" style="color: rgba(var(--text))">
+          [M]ouse
+        </button>
+        <button id="keyboard-select-btn-5" title="Teams layer button" type="button" style="color: rgba(var(--text))">
+          [T]eams
+        </button>
       </div>
-      <h4>An interactive tool for my custom keyboard layout</h4>
-    </header>
-    <main>
-      <div id="keyboard-details">
-        <div><span class="detail-title">Keyboard:</span> ZSA's PLANCK EZ</div>
-        <div><span class="detail-title">Layout:</span> QWERTY</div>
-      </div>
-      <div id="keyboard-layout">
-        <div id="Keyboard Layout-0">
-          <div id="Keyboard Layout-btn-row" class="btn-row">
-            <button id="keyboard-select-btn-0" title="Base layer button" type="button" style="color: rgba(var(--teal))">
-              [B]ase
-            </button>
-            <button
-              id="keyboard-select-btn-1"
-              title="Lower layer button"
-              type="button"
-              style="color: rgba(var(--text))"
-            >
-              [L]ower
-            </button>
-            <button
-              id="keyboard-select-btn-2"
-              title="Raise layer button"
-              type="button"
-              style="color: rgba(var(--text))"
-            >
-              [R]aise
-            </button>
-            <button
-              id="keyboard-select-btn-3"
-              title="Adjust layer button"
-              type="button"
-              style="color: rgba(var(--text))"
-            >
-              [A]djust
-            </button>
-            <button
-              id="keyboard-select-btn-4"
-              title="Mouse layer button"
-              type="button"
-              style="color: rgba(var(--text))"
-            >
-              [M]ouse
-            </button>
-            <button
-              id="keyboard-select-btn-5"
-              title="Teams layer button"
-              type="button"
-              style="color: rgba(var(--text))"
-            >
-              [T]eams
-            </button>
-          </div>
-        </div>
-      </div>
-    </main>
-  </body>
+    </div>
+  </main>
+</body>
+
 </html>
