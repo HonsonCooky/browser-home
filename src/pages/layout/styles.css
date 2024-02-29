@@ -1,0 +1,82 @@
+@import url("../../global/styles.css");
+
+#keyboard-details {
+  display: flex;
+  flex-direction: column;
+  padding: 2vh 2vw 4vh 2vw;
+}
+
+.detail-title {
+  display: inline-flex;
+  min-width: 10vw;
+  color: rgba(var(--mauve));
+  font-weight: 800;
+}
+
+.sub-section {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  border: none;
+  border-radius: 1vh;
+}
+
+.btn-row {
+  display: flex;
+  flex-direction: row;
+  gap: 0.2vw;
+  padding: 2vh 2vw;
+}
+
+.btn-row>button {
+  flex: 1;
+  border: none;
+  border-bottom: 4px solid rgba(var(--crust));
+  border-radius: 1vh;
+  background: rgba(var(--surface0));
+  min-width: 10%;
+  height: 30px;
+  overflow: hidden;
+  font-size: 20px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.btn-row>.trailing-btn {
+  min-width: 5%;
+  font-size: 16px;
+}
+
+.tool-msg {
+  text-align: center;
+}
+
+.layout {
+  grid-gap: 5px;
+  outline: none;
+  border-radius: 1vh;
+  padding: 2vh 2vw;
+}
+
+.layout>.keyboard-btn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-bottom: 2px solid rgba(var(--crust));
+  border-radius: 1vh;
+  background: rgba(var(--mantle));
+  padding: 1vh;
+  font-weight: 300;
+  text-align: center;
+  word-break: break-all;
+  overflow-wrap: break-word;
+}
+
+.special {
+  font-style: italic;
+  font-weight: 800;
+}
+
+.key-highlight {
+  background: rgba(var(--yellow), 0.2) !important;
+}

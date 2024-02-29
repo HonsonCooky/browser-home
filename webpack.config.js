@@ -7,6 +7,7 @@ module.exports = {
     ".": "./src/pages/home/scripts.js",
     "dev-tools": "./src/pages/dev-tools/scripts.js",
     edge: "./src/pages/edge/scripts.js",
+    layout: "./src/pages/layout/scripts.js",
     vim: "./src/pages/vim/scripts.js",
     vimium: "./src/pages/vimium/scripts.js",
   },
@@ -58,6 +59,15 @@ module.exports = {
       favicon: "./src/assets/HC_LOGO_LIGHT_48x48.png",
       scriptLoading: "blocking",
       chunks: ["edge"],
+    }),
+    new HtmlWebpackPlugin({
+      title: "Keyboard Layout",
+      filename: "layout/index.html",
+      template: "./src/pages/layout/index.html",
+      inject: "head",
+      favicon: "./src/assets/HC_LOGO_LIGHT_48x48.png",
+      scriptLoading: "blocking",
+      chunks: ["layout"],
     }),
     new HtmlWebpackPlugin({
       title: "Vim",

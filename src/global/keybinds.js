@@ -1,3 +1,6 @@
+const specialKeys = ["Alt", "Control", "Shift"];
+
+let keymapLock = false;
 let keymaps = {
   i: {
     name: "Internal Links",
@@ -93,7 +96,8 @@ export function loadGlobalKeybindings() {
     }
   }
 
-  function clearKeySequence() {
+  function clearKeySequence(event) {
+    if (specialKeys.includes(event.key)) return;
     currentKeySequence = [];
     const whichKey = document.getElementById(whichKeyId);
     if (whichKey) {
@@ -102,12 +106,13 @@ export function loadGlobalKeybindings() {
   }
 
   function keySequence(event) {
+    if (specialKeys.includes(event.key)) return;
     event.preventDefault();
 
     if (event.key === "Backspace") {
       currentKeySequence.pop();
     } else {
-      currentKeySequence.push(event.key.toLowerCase());
+      currentKeySequence.push(event.key);
     }
 
     let currentKeyMap = keymaps;
@@ -116,13 +121,13 @@ export function loadGlobalKeybindings() {
     }
 
     if (!currentKeyMap) {
-      clearKeySequence();
+      clearKeySequence(event);
       return;
     }
 
     if (currentKeyMap.action) {
       currentKeyMap.action();
-      clearKeySequence();
+      clearKeySequence(event);
       return;
     } else {
       showKeyBindings(currentKeyMap);
@@ -130,7 +135,7 @@ export function loadGlobalKeybindings() {
   }
 
   window.addEventListener("keydown", function(event) {
-    if (document.activeElement.tagName === "INPUT") {
+    if (document.activeElement.tagName === "INPUT" || document.activeElement.classList.contains("layout")) {
       return;
     }
 
@@ -141,10 +146,10 @@ export function loadGlobalKeybindings() {
 
     // BASIC ACTIONS
     switch (event.key) {
-      case "H":
+      case "<":
         window.history.back();
         break;
-      case "L":
+      case ">":
         window.history.forward();
         break;
       case "j":
@@ -170,7 +175,10 @@ export function loadGlobalKeybindings() {
         break;
       case "Escape":
       default:
-        clearKeySequence();
+        clearKeySequence(event);
+        if (keymaps[event.key]?.action) {
+          keymaps[event.key].action();
+        }
         break;
     }
   });
