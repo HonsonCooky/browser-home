@@ -33,6 +33,7 @@ main {
   background: rgba(var(--overlay0));
   padding: 2vh;
   height: 18vh;
+  resize: none;
 }
 
 #json-to-html button {

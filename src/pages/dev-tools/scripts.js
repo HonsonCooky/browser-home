@@ -14,8 +14,9 @@ window.addEventListener("load", function() {
   const runBtn = document.getElementById("run");
   const copyBtn = document.getElementById("copy");
 
-  function jsonObjToUl(obj, parent) {
+  function jsonObjToUl(obj, parent, depth) {
     const div = document.createElement("div");
+    div.class = `base-${depth}`;
     for (const entry of Object.entries(obj)) {
       const spanKey = document.createElement("span");
       spanKey.innerText = entry[0];
@@ -24,7 +25,7 @@ window.addEventListener("load", function() {
 
       let spanValue = document.createElement("span");
       if (typeof entry[1] === "object") {
-        jsonObjToUl(entry[1], div);
+        jsonObjToUl(entry[1], div, depth + 1);
         continue;
       } else {
         spanValue.innerText = entry[1];
@@ -41,8 +42,9 @@ window.addEventListener("load", function() {
   runBtn.addEventListener("click", function() {
     try {
       const parent = document.createElement("div");
+      parent.class = "base";
       const jsonObj = JSON.parse(input.value);
-      jsonObjToUl(jsonObj, parent);
+      jsonObjToUl(jsonObj, parent, 0);
       output.value = parent.outerHTML;
     } catch (e) {
       output.innerText = `Failed To Run: ${e.message}`;
@@ -53,7 +55,6 @@ window.addEventListener("load", function() {
     navigator.clipboard
       .writeText(output.value)
       .then(() => {
-        console.log("here");
         copyBtn.innerText = "Copied";
         setTimeout(() => (copyBtn.innerText = "Copy"), 2000);
       })

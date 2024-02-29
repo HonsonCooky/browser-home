@@ -5,8 +5,9 @@ module.exports = {
   mode: "production",
   entry: {
     ".": "./src/pages/home/scripts.js",
-    edge: "./src/pages/edge/scripts.js",
     "dev-tools": "./src/pages/dev-tools/scripts.js",
+    edge: "./src/pages/edge/scripts.js",
+    vim: "./src/pages/vim/scripts.js",
   },
   output: {
     filename: "[name]/bundle.js",
@@ -40,6 +41,15 @@ module.exports = {
       chunks: ["."],
     }),
     new HtmlWebpackPlugin({
+      title: "DevTools",
+      filename: "dev-tools/index.html",
+      template: "./src/pages/dev-tools/index.html",
+      inject: "head",
+      favicon: "./src/assets/HC_LOGO_LIGHT_48x48.png",
+      scriptLoading: "blocking",
+      chunks: ["dev-tools"],
+    }),
+    new HtmlWebpackPlugin({
       title: "Edge",
       filename: "edge/index.html",
       template: "./src/pages/edge/index.html",
@@ -49,13 +59,13 @@ module.exports = {
       chunks: ["edge"],
     }),
     new HtmlWebpackPlugin({
-      title: "DevTools",
-      filename: "dev-tools/index.html",
-      template: "./src/pages/dev-tools/index.html",
+      title: "Vim",
+      filename: "vim/index.html",
+      template: "./src/pages/vim/index.html",
       inject: "head",
       favicon: "./src/assets/HC_LOGO_LIGHT_48x48.png",
       scriptLoading: "blocking",
-      chunks: ["dev-tools"],
+      chunks: ["vim"],
     }),
   ],
   devServer: {
