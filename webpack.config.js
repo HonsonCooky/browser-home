@@ -8,6 +8,7 @@ module.exports = {
     "dev-tools": "./src/pages/dev-tools/scripts.js",
     edge: "./src/pages/edge/scripts.js",
     vim: "./src/pages/vim/scripts.js",
+    vimium: "./src/pages/vimium/scripts.js",
   },
   output: {
     filename: "[name]/bundle.js",
@@ -66,6 +67,15 @@ module.exports = {
       favicon: "./src/assets/HC_LOGO_LIGHT_48x48.png",
       scriptLoading: "blocking",
       chunks: ["vim"],
+    }),
+    new HtmlWebpackPlugin({
+      title: "Vimium",
+      filename: "vimium/index.html",
+      template: "./src/pages/vimium/index.html",
+      inject: "head",
+      favicon: "./src/assets/HC_LOGO_LIGHT_48x48.png",
+      scriptLoading: "blocking",
+      chunks: ["vimium"],
     }),
   ],
   devServer: {

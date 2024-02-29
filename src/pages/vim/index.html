@@ -25,8 +25,6 @@
           ><span>:ter[minal]</span><span>:</span><span>open a terminal window</span><span>K</span><span>:</span
           ><span>open man page for word under the cursor</span><span>Tip</span><span>:</span
           ><span>Run vimtutor in a terminal to learn the first Vim commands</span>
-        </div>
-        <div class="section-1">
           <div class="title-1">Cursor Movement</div>
           <span>0</span><span>:</span><span>jump to the start of the line</span><span>h</span><span>:</span
           ><span>move cursor left</span><span>j</span><span>:</span><span>move cursor down</span><span>k</span
@@ -71,8 +69,6 @@
           ><span>move cursor and screen down 1/2 page</span><span>Ctrl + u</span><span>:</span
           ><span>move cursor and screen up 1/2 page</span><span>Tip</span><span>:</span
           ><span>Prefix a cursor movement command with a number to repeat it. For example, 4j moves down 4 lines.</span>
-        </div>
-        <div class="section-1">
           <div class="title-1">Insert mode - inserting/appending text</div>
           <span>i</span><span>:</span><span>insert before the cursor</span><span>I</span><span>:</span
           ><span>insert at the beginning of the line</span><span>a</span><span>:</span
@@ -91,8 +87,6 @@
           ><span>Ctrl + rx</span><span>:</span><span>insert the contents of register x</span><span>Ctrl + ox</span
           ><span>:</span><span>Temporarily enter normal mode to issue one normal-mode command x.</span
           ><span>Esc or Ctrl + c</span><span>:</span><span>exit insert mode</span>
-        </div>
-        <div class="section-1">
           <div class="title-1">Editing</div>
           <span>r</span><span>:</span><span>replace a single character.</span><span>R</span><span>:</span
           ><span>replace more than one character, until ESC is pressed.</span><span>J</span><span>:</span
@@ -110,8 +104,6 @@
           ><span>transpose two letters (delete and paste)</span><span>u</span><span>:</span><span>undo</span
           ><span>U</span><span>:</span><span>restore (undo) last changed line</span><span>Ctrl + r</span><span>:</span
           ><span>redo</span><span>.</span><span>:</span><span>repeat last command</span>
-        </div>
-        <div class="section-1">
           <div class="title-1">Marking Text (Visual Mode)</div>
           <span>v</span><span>:</span><span>start visual mode, mark lines, then do a command (like y-yank)</span
           ><span>V</span><span>:</span><span>start linewise visual mode</span><span>o</span><span>:</span
@@ -124,16 +116,12 @@
           ><span>inner block with &lt;&gt; tags</span><span>Esc or Ctrl + c</span><span>:</span
           ><span>exit visual mode</span><span>Tip</span><span>:</span
           ><span>Instead of b or B one can also use ( or { respectively.</span>
-        </div>
-        <div class="section-1">
           <div class="title-1">Visual Commands</div>
           <span>&gt;</span><span>:</span><span>shift text right</span><span>&lt;</span><span>:</span
           ><span>shift text left</span><span>y</span><span>:</span><span>yank (copy) marked text</span><span>d</span
           ><span>:</span><span>delete marked text</span><span>~</span><span>:</span><span>switch case</span
           ><span>u</span><span>:</span><span>change marked text to lowercase</span><span>U</span><span>:</span
           ><span>change marked text to uppercase</span>
-        </div>
-        <div class="section-1">
           <div class="title-1">Registers</div>
           <span>:reg[isters]</span><span>:</span><span>show registers content</span><span>"xy</span><span>:</span
           ><span>yank into register x</span><span>"xp</span><span>:</span><span>paste contents of register x</span
@@ -152,8 +140,6 @@
             ><span>=</span><span>:</span><span>expression register</span><span>_</span><span>:</span
             ><span>black hole register</span>
           </div>
-        </div>
-        <div class="section-1">
           <div class="title-1">Marks And Positions</div>
           <span>:marks</span><span>:</span><span>list of marks</span><span>ma</span><span>:</span
           ><span>set current position for mark A</span><span>`a</span><span>:</span
@@ -173,14 +159,10 @@
             >To jump to a mark you can either use a backtick (`) or an apostrophe ('). Using an apostrophe jumps to the
             beginning (first non-blank) of the line holding the mark.</span
           >
-        </div>
-        <div class="section-1">
           <div class="title-1">Macros</div>
           <span>qa</span><span>:</span><span>record macro a</span><span>q</span><span>:</span
           ><span>stop recording macro</span><span>@a</span><span>:</span><span>run macro a</span><span>@@</span
           ><span>:</span><span>rerun last run macro</span>
-        </div>
-        <div class="section-1">
           <div class="title-1">Cut And Paste</div>
           <span>yy</span><span>:</span><span>yank (copy) a line</span><span>2yy</span><span>:</span
           ><span>yank (copy) 2 lines</span><span>yw</span><span>:</span
@@ -209,8 +191,6 @@
             ><span>:</span><span>From the current line to the beginning of the file </span><span>:10,$d</span
             ><span>:</span><span>From the 10th line to the beginning of the file</span>
           </div>
-        </div>
-        <div class="section-1">
           <div class="title-1">Indent Text</div>
           <span>&gt;&gt;</span><span>:</span><span>indent (move right) line one shiftwidth</span><span>&lt;&lt;</span
           ><span>:</span><span>de-indent (move left) line one shiftwidth</span><span>&gt;%</span><span>:</span
@@ -222,8 +202,6 @@
           ><span>:</span><span>re-indent inner block with {}</span><span>gg=G</span><span>:</span
           ><span>re-indent entire buffer</span><span>]p</span><span>:</span
           ><span>paste and adjust indent to current line</span>
-        </div>
-        <div class="section-1">
           <div class="title-1">Exiting</div>
           <span>:w</span><span>:</span><span>write (save) the file, but don't exit</span><span>:w !sudo tee %</span
           ><span>:</span><span>write out the current file using sudo</span><span>:wq or :x or ZZ</span><span>:</span
@@ -231,8 +209,6 @@
           ><span>quit (fails if there are unsaved changes)</span><span>:q! or ZQ</span><span>:</span
           ><span>quit and throw away unsaved changes</span><span>:wqa</span><span>:</span
           ><span>write (save) and quit on all tabs</span>
-        </div>
-        <div class="section-1">
           <div class="title-1">Search And Replace</div>
           <span>/pattern</span><span>:</span><span>search for pattern</span><span>?pattern</span><span>:</span
           ><span>search backward for pattern</span><span>\vpattern</span><span>:</span
@@ -244,8 +220,6 @@
           ><span>replace all old with new throughout file</span><span>:%s/old/new/gc</span><span>:</span
           ><span>replace all old with new throughout file with confirmations</span><span>:noh[lsearch]</span
           ><span>:</span><span>remove highlighting of search matches</span>
-        </div>
-        <div class="section-1">
           <div class="title-1">Search In Multiple Files</div>
           <span>:vim[grep] /pattern/ {`{file}`}</span><span>:</span><span>search for pattern in multiple files</span
           ><span>e.g.</span><span>:</span><span>:vim[grep] /foo/ **/*</span><span>:cn[ext]</span><span>:</span
@@ -253,8 +227,6 @@
           ><span>jump to the previous match</span><span>:cope[n]</span><span>:</span
           ><span>open a window containing the list of matches</span><span>:ccl[ose]</span><span>:</span
           ><span>close the quickfix window</span>
-        </div>
-        <div class="section-1">
           <div class="title-1">Tabs</div>
           <span>:tabnew or :tabnew {page.words.file}</span><span>:</span><span>open a file in a new tab</span
           ><span>Ctrl + wT</span><span>:</span><span>move the current split window into its own tab</span
@@ -265,8 +237,6 @@
           ><span>close the current tab and all its windows</span><span>:tabo[nly]</span><span>:</span
           ><span>close all tabs except for the current one</span><span>:tabdo command</span><span>:</span
           ><span>run the command on all tabs (e.g. :tabdo q - closes all opened tabs)</span>
-        </div>
-        <div class="section-1">
           <div class="title-1">Working With Multiple Files</div>
           <span>:e[dit] file</span><span>:</span><span>edit a file in a new buffer</span><span>:bn[ext]</span
           ><span>:</span><span>go to the next buffer</span><span>:bp[revious]</span><span>:</span
@@ -293,8 +263,6 @@
           ><span>make current window full width at the very bottom (bottommost horizontal window)</span
           ><span>Ctrl + wK</span><span>:</span
           ><span>make current window full width at the very top (topmost horizontal window)</span>
-        </div>
-        <div class="section-1">
           <div class="title-1">Diff</div>
           <span>zf</span><span>:</span><span>manually define a fold up to motion</span><span>zd</span><span>:</span
           ><span>delete fold under the cursor</span><span>za</span><span>:</span
