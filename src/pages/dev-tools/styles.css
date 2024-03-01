@@ -28,7 +28,6 @@ main {
 }
 
 #json-to-html textarea {
-  outline: none;
   border-radius: 2vh 2vh 0 0;
   background: rgba(var(--overlay0));
   padding: 2vh;
@@ -37,7 +36,6 @@ main {
 }
 
 #json-to-html button {
-  outline: none;
   border: none;
   border-radius: 0 0 2vh 2vh;
   background: rgba(var(--crust));

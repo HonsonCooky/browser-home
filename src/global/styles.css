@@ -5,6 +5,7 @@
 
 /* Default Values */
 * {
+  outline: none;
   color: rgba(var(--text));
   font-family: "JetBrains Mono", monospace;
 }
@@ -22,7 +23,7 @@
 }
 
 *:focus {
-  border: 2px dotted rgba(var(--lavender)) !important;
+  outline: 2px dotted rgba(var(--lavender)) !important;
 }
 
 html,
@@ -66,7 +67,6 @@ img {
 }
 
 input {
-  outline: none;
   border: 2px solid rgba(var(--crust));
   border-radius: 100vh;
   background: rgba(var(--mantle));
@@ -144,4 +144,31 @@ input::-webkit-input-placeholder {
 .marked-highlight {
   color: rgba(var(--yellow)) !important;
   font-weight: 800;
+}
+
+.btn-row {
+  display: flex;
+  flex-direction: row;
+  gap: 0.2vw;
+  padding: 2vh 0;
+}
+
+.btn-row>button {
+  flex: 1;
+  border: none;
+  border-bottom: 4px solid rgba(var(--crust));
+  border-radius: 1vh;
+  background: rgba(var(--surface0));
+  min-width: 10%;
+  height: 30px;
+  overflow: hidden;
+  font-size: 20px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.btn-row>.trailing-btn {
+  min-width: 30px;
+  max-width: 50px;
+  font-size: 16px;
 }

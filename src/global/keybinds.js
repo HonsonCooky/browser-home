@@ -8,7 +8,7 @@ let keymaps = {
     c: { name: "Canvas", action: () => internalPageJump("/canvas/") },
     d: { name: "Dev Tools", action: () => internalPageJump("/dev-tools/") },
     e: { name: "Edge Shortcuts", action: () => internalPageJump("/edge/") },
-    l: { name: "Keyboard Layout", action: () => internalPageJump("/layout/") },
+    k: { name: "Keyboard Layout", action: () => internalPageJump("/layout/") },
     t: { name: "Todo Lists", action: () => internalPageJump("/todo/") },
     v: { name: "Vim Shortcuts", action: () => internalPageJump("/vim/") },
     w: { name: "Vimium Shortcuts", action: () => internalPageJump("/vimium/") },
@@ -43,6 +43,10 @@ export function addKeybinding({ keyPath, name, action }) {
     }
     keybinding = keybinding[k];
   }
+}
+
+export function removeKeybindingFGroup() {
+  delete keymaps.i.f;
 }
 
 export function focusElement(elementIdentifer, index) {
@@ -84,7 +88,9 @@ export function loadGlobalKeybindings() {
       whichKey.innerHTML = "";
     }
 
-    for (const [key, value] of Object.entries(currentKeyMap)) {
+    const entires = Object.entries(currentKeyMap);
+    entires.sort((a, b) => a[0].localeCompare(b[0]));
+    for (const [key, value] of entires) {
       if (!value.name) continue;
       const div = document.createElement("div");
       if (!value.action) {
@@ -134,8 +140,12 @@ export function loadGlobalKeybindings() {
     }
   }
 
-  window.addEventListener("keydown", function(event) {
-    if (document.activeElement.tagName === "INPUT" || document.activeElement.classList.contains("layout")) {
+  window.addEventListener("keydown", function (event) {
+    if (
+      document.activeElement.tagName === "INPUT" ||
+      document.activeElement.classList.contains("layout") ||
+      document.activeElement.classList.contains("list")
+    ) {
       return;
     }
 
@@ -165,7 +175,20 @@ export function loadGlobalKeybindings() {
         window.scrollBy({ top: -window.innerHeight, behavior: "smooth" });
         break;
       case "/":
-        const input = document.body.querySelector("input");
+        const inputs = Array.from(document.activeElement.querySelectorAll("input"));
+
+        if (inputs.length === 0) return;
+
+        let input;
+        if (inputs.length === 1) input = inputs[0];
+        else {
+          for (const i of inputs) {
+            if (i.closest("div").style.display === "none") continue;
+            input = i;
+            break;
+          }
+        }
+
         if (input) {
           event.preventDefault();
           input.focus({ preventScroll: true });
@@ -176,6 +199,11 @@ export function loadGlobalKeybindings() {
       case "Escape":
       default:
         clearKeySequence(event);
+
+        if (document.activeElement != document.body) {
+          document.activeElement.blur();
+        }
+
         if (keymaps[event.key]?.action) {
           keymaps[event.key].action();
         }

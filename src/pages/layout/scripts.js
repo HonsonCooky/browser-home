@@ -5,6 +5,7 @@ import { addKeybinding } from "../../global/keybinds";
 
 window.addEventListener("load", function () {
   const keyboardSection = document.getElementById("keyboard-layouts");
+  const keyboardBtnRow = document.getElementById("keyboard-layout-btn-row");
 
   function loadKeyboardKeys(keyboardLayout, tIndex, rows, cols, titles, content) {
     for (let i = 0; i < rows; i++) {
@@ -93,56 +94,20 @@ window.addEventListener("load", function () {
       createKeyboardLayout(data);
     });
 
-  addKeybinding({
-    keyPath: "i.k.b",
-    name: ".Keyboard Layout.Base Layer",
-    action: () => {
-      this.document.getElementById("keyboard-select-btn-0").click();
-    },
-  });
+  for (const child of keyboardBtnRow.children) {
+    const btnIndex = Array.from(keyboardBtnRow.children).indexOf(child);
+    const charIndex = ((btnIndex + 64) % 94) + 33;
+    const keybindingChar = String.fromCharCode(charIndex);
+    const keybindingName = child.title.replace(" layer button", "");
+    addKeybinding({
+      keyPath: `i.f.${keybindingChar}`,
+      name: `.Keyboard Layout.${keybindingName}`,
+      action: () => child.click(),
+    });
+  }
 
   addKeybinding({
-    keyPath: "i.k.l",
-    name: "Lower Layer",
-    action: () => {
-      this.document.getElementById("keyboard-select-btn-1").click();
-    },
-  });
-
-  addKeybinding({
-    keyPath: "i.k.r",
-    name: "Raise Layer",
-    action: () => {
-      this.document.getElementById("keyboard-select-btn-2").click();
-    },
-  });
-
-  addKeybinding({
-    keyPath: "i.k.a",
-    name: "Adjust Layer",
-    action: () => {
-      this.document.getElementById("keyboard-select-btn-3").click();
-    },
-  });
-
-  addKeybinding({
-    keyPath: "i.k.m",
-    name: "Mouse Layer",
-    action: () => {
-      this.document.getElementById("keyboard-select-btn-4").click();
-    },
-  });
-
-  addKeybinding({
-    keyPath: "i.k.t",
-    name: "Teams Layer",
-    action: () => {
-      this.document.getElementById("keyboard-select-btn-5").click();
-    },
-  });
-
-  addKeybinding({
-    keyPath: "i.k.k",
+    keyPath: "i.f.k",
     name: "Highlight Key Tool",
     action: () => {
       const curLayout = keyboardSection.querySelector('.layout[style*="display: grid"]');

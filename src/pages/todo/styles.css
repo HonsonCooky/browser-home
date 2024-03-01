@@ -1,8 +1,14 @@
 @import url("../../global/styles.css");
 
+main {
+  padding: 1vh 2vw;
+}
+
 .list {
+  display: flex;
   flex-direction: column;
   border-radius: 1vh;
+  padding: 1vh 2vw;
 }
 
 .list-item {
@@ -21,4 +27,9 @@
 
 .list-item>span {
   margin: 0 2vw;
+}
+
+li {
+  border-radius: 2vh;
+  padding: 0.2vh 2vw;
 }
