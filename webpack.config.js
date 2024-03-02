@@ -5,6 +5,7 @@ module.exports = {
   mode: "production",
   entry: {
     ".": "./src/pages/home/scripts.js",
+    canvas: "./src/pages/canvas/scripts.js",
     "dev-tools": "./src/pages/dev-tools/scripts.js",
     edge: "./src/pages/edge/scripts.js",
     layout: "./src/pages/layout/scripts.js",
@@ -42,6 +43,15 @@ module.exports = {
       favicon: "./src/assets/HC_LOGO_LIGHT_48x48.png",
       scriptLoading: "blocking",
       chunks: ["."],
+    }),
+    new HtmlWebpackPlugin({
+      title: "Canvas",
+      filename: "canvas/index.html",
+      template: "./src/pages/canvas/index.html",
+      inject: "head",
+      favicon: "./src/assets/HC_LOGO_LIGHT_48x48.png",
+      scriptLoading: "blocking",
+      chunks: ["canvas"],
     }),
     new HtmlWebpackPlugin({
       title: "DevTools",

@@ -1,0 +1,52 @@
+@import url("../../global/styles.css");
+
+body {
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+}
+
+main {
+  display: flex;
+  flex-direction: row;
+  gap: 0.5vw;
+  height: 100%;
+}
+
+.side-panel {
+  display: flex;
+  flex: 5;
+  flex-direction: column;
+  align-items: center;
+  gap: 1vh;
+  padding: 2vh 0;
+}
+
+.side-panel>button {
+  border: none;
+  border-bottom: 4px solid rgba(var(--crust));
+  border-radius: 1vh;
+  background: rgba(var(--surface0));
+  width: 40px;
+  height: 40px;
+  overflow: hidden;
+  font-size: 20px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.side-panel>button>i {
+  position: relative;
+  top: calc(50% - 18px);
+  color: rgba(var(--text));
+}
+
+#canvas-container {
+  flex: 95;
+  height: 100%;
+}
+
+canvas {
+  border-radius: 2vh;
+  background: rgba(var(--mantle));
+}
