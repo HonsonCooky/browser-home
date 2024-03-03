@@ -8,6 +8,8 @@ main {
   display: flex;
   flex-direction: column;
   padding: 2vh 0 4vh 0;
+  font-weight: 300;
+  font-size: 16px;
 }
 
 .detail-title {
@@ -31,6 +33,7 @@ main {
   background: rgba(var(--mantle));
   padding: 1vh;
   font-weight: 300;
+  font-size: 16px;
   text-align: center;
   word-break: break-all;
   overflow-wrap: break-word;

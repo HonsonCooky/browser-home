@@ -99,6 +99,8 @@ input::-webkit-input-placeholder {
   background: rgba(var(--crust));
   padding: 1vh 2vw;
   width: 80%;
+  font-weight: 300;
+  font-size: 16px;
 }
 
 #which-key span {

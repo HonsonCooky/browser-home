@@ -4,6 +4,11 @@ main {
   padding: 1vh 2vw;
 }
 
+h5 {
+  font-weight: 300;
+  font-size: 24px;
+}
+
 .list {
   display: flex;
   flex-direction: column;
