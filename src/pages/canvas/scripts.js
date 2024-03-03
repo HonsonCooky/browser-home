@@ -11,6 +11,7 @@ window.addEventListener("load", function () {
   let currentPath = undefined;
   let currentText = undefined;
   let currentIndex = undefined;
+  let mousedown = false;
   let locked = false;
   let currentColor = "--text";
 
@@ -265,6 +266,32 @@ window.addEventListener("load", function () {
     }
   }
 
+  function moveDrawing(e) {
+    const selectedShape = ramCache[currentIndex];
+    if (!selectedShape) return;
+
+    const curLocation = getMouseLocation(e);
+    if (lastLocation) {
+      const xDiff = curLocation.x - lastLocation.x;
+      const yDiff = curLocation.y - lastLocation.y;
+      const isLargeDistance = Math.hypot(xDiff, yDiff) > 10;
+      if (isLargeDistance) {
+        if (selectedShape.type === "draw") {
+          for (const p of selectedShape.path) {
+            p.x += xDiff;
+            p.y += yDiff;
+          }
+        }
+        selectedShape.x += xDiff;
+        selectedShape.y += yDiff;
+        lastLocation = curLocation;
+      }
+    } else {
+      lastLocation = curLocation;
+    }
+    render();
+  }
+
   function reset() {
     startLocation = undefined;
     lastLocation = undefined;
@@ -299,14 +326,22 @@ window.addEventListener("load", function () {
   }
 
   canvas.addEventListener("mousedown", function (e) {
+    canvas.tabIndex = -1;
+    canvas.focus();
+    mousedown = true;
     startDrawing(e);
   });
 
   canvas.addEventListener("mouseup", function (e) {
+    mousedown = false;
     if (currentTool === "mouse") {
       let clicked = findClickedShape(e);
-      if (clicked) {
+      if (clicked && currentIndex === undefined) {
         currentIndex = ramCache.indexOf(clicked);
+        render();
+      } else {
+        localStorage.setItem(cacheTitle, JSON.stringify(ramCache));
+        reset();
         render();
       }
       return;
@@ -315,7 +350,9 @@ window.addEventListener("load", function () {
   });
 
   canvas.addEventListener("mousemove", function (e) {
-    if (startLocation && currentTool != "text") updateDrawing(e);
+    if (currentTool === "text") return;
+    if (startLocation) updateDrawing(e);
+    if (currentIndex != undefined && mousedown) moveDrawing(e);
   });
 
   document.getElementById("erase-select-btn").addEventListener("click", function () {
@@ -333,9 +370,14 @@ window.addEventListener("load", function () {
   });
 
   window.addEventListener("keydown", function (event) {
+    if (event.key === "Delete" && currentIndex != undefined) {
+      ramCache.splice(currentIndex, 1);
+      localStorage.setItem(cacheTitle, JSON.stringify(ramCache));
+      render();
+    }
+
     if (currentTool === "text" || (currentTool === "mouse" && ramCache[currentIndex]?.type === "text")) {
       update(event);
-      console.log(ramCache);
       render();
       return;
     }

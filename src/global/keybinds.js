@@ -1,6 +1,5 @@
 const specialKeys = ["Alt", "Control", "Shift"];
 
-let keymapLock = false;
 let keymaps = {
   i: {
     name: "Internal Links",
@@ -144,10 +143,12 @@ export function loadGlobalKeybindings() {
     if (
       document.activeElement.tagName === "INPUT" ||
       document.activeElement.classList.contains("layout") ||
-      document.activeElement.classList.contains("list")
+      document.activeElement.classList.contains("list") ||
+      document.activeElement.tagName === "CANVAS"
     ) {
       return;
     }
+    console.log(document.activeElement.tagName);
 
     if (event.key === leader || currentKeySequence[0] === leader) {
       keySequence(event);
