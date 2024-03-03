@@ -9,6 +9,10 @@ header {
   align-items: center;
 }
 
+h1 {
+  font-size: 80px;
+}
+
 p {
   font-size: 16px;
 }

@@ -1,13 +1,11 @@
 import "../../global/index";
-import { addKeybinding, focusElement } from "../../global/keybinds";
 import { implementSearchBox } from "../../global/searchbox";
 import "./styles.css";
 
-window.addEventListener("load", function() {
+window.addEventListener("load", function () {
   const searchBox = document.getElementById("search");
   const searchElement = document.querySelector("main");
   implementSearchBox(searchBox, searchElement);
-  addKeybinding({ keyPath: "i.1", name: ".JSON to HTML", action: () => focusElement("json-to-html") });
 
   const input = document.getElementById("input");
   const output = document.getElementById("output");
@@ -39,7 +37,7 @@ window.addEventListener("load", function() {
     parent.appendChild(div);
   }
 
-  runBtn.addEventListener("click", function() {
+  runBtn.addEventListener("click", function () {
     try {
       const parent = document.createElement("div");
       parent.class = "base";
@@ -51,7 +49,7 @@ window.addEventListener("load", function() {
     }
   });
 
-  copyBtn.addEventListener("click", function() {
+  copyBtn.addEventListener("click", function () {
     navigator.clipboard
       .writeText(output.value)
       .then(() => {

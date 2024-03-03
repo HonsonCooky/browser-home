@@ -48,16 +48,6 @@ export function removeKeybindingFGroup() {
   delete keymaps.i.f;
 }
 
-export function focusElement(elementIdentifer, index) {
-  let element = document.getElementById(elementIdentifer);
-  if (!element) element = document.querySelector(elementIdentifer);
-  if (index) element = document.querySelectorAll(elementIdentifer).item(index);
-
-  element.tabIndex = -1;
-  element.focus({ preventScroll: true });
-  element.scrollIntoView();
-}
-
 function internalPageJump(url) {
   if (window.origin.includes("extension")) {
     const scripts = document.getElementsByTagName("script");
