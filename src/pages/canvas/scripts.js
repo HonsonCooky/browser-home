@@ -63,8 +63,8 @@ window.addEventListener("load", function () {
     let [x1, y1, x2, y2] = [x, y, x + width, y + height];
     if (shape.type === "text") {
       x2 = x1 + context.measureText(shape.text).width;
-      y1 -= fontSize / 2;
-      y2 = y1 + fontSize;
+      y1 -= fontSize + 2;
+      y2 = y1 + fontSize + 10;
     }
     if (shape.type === "draw") {
       for (const path of shape.path) {
@@ -133,7 +133,6 @@ window.addEventListener("load", function () {
   }
 
   function highlightSelected() {
-    console.log("here", currentIndex);
     if (currentIndex === undefined) return;
     const shape = ramCache[currentIndex];
     if (!shape) return;
@@ -171,15 +170,17 @@ window.addEventListener("load", function () {
   }
 
   function storeShape() {
+    const existing = ramCache[currentIndex];
+
     const obj = {
-      type: currentTool,
+      type: existing?.type ?? currentTool,
       color: currentColor,
-      x: startLocation.x,
-      y: startLocation.y,
-      width: currentWidth,
-      height: currentHeight,
-      path: currentPath,
-      text: currentText,
+      x: startLocation?.x ?? existing.x,
+      y: startLocation?.y ?? existing.y,
+      width: existing?.width ?? currentWidth,
+      height: existing?.height ?? currentHeight,
+      path: existing?.path ?? currentPath,
+      text: currentText ?? existing?.text,
     };
 
     if (currentIndex >= 0 && currentIndex < ramCache.length) {
@@ -242,15 +243,15 @@ window.addEventListener("load", function () {
       return;
     }
 
-    if (!currentText) currentText = "";
-
+    if (!currentText) currentText = ramCache[currentIndex]?.text ?? "";
     currentText += key;
-    currentIndex = ramCache.length - 1;
+
+    if (currentIndex === undefined) currentIndex = ramCache.length - 1;
     storeShape();
   }
 
   function update(e) {
-    switch (currentTool) {
+    switch (ramCache[currentIndex]?.type ?? currentTool) {
       case "rect":
       case "circle":
         updateShape(e);
@@ -292,7 +293,7 @@ window.addEventListener("load", function () {
   }
 
   function updateDrawing(e) {
-    currentIndex = ramCache.length - 1;
+    if (currentIndex === undefined) currentIndex = ramCache.length - 1;
     update(e);
     render();
   }
@@ -332,8 +333,9 @@ window.addEventListener("load", function () {
   });
 
   window.addEventListener("keydown", function (event) {
-    if (currentTool === "text" || (currentTool === "mouse" && ramCache[currentIndex].type === "text")) {
+    if (currentTool === "text" || (currentTool === "mouse" && ramCache[currentIndex]?.type === "text")) {
       update(event);
+      console.log(ramCache);
       render();
       return;
     }
