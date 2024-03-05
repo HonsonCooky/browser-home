@@ -20,6 +20,7 @@ let keymaps = {
     e: { name: "Exercism", action: () => externalPageJump("https://exercism.org") },
     g: { name: "GitHub", action: () => externalPageJump("https://github.com/HonsonCooky") },
     h: { name: "Gmail", action: () => externalPageJump("https://mail.google.com") },
+    i: { name: "Instagram", action: () => externalPageJump("https://www.instagram.com") },
     m: { name: "Messenger", action: () => externalPageJump("https://www.messenger.com") },
     n: { name: "Netflix", action: () => externalPageJump("https://www.netflix.com/browse") },
     o: { name: "Neon", action: () => externalPageJump("https://www.neontv.co.nz") },
