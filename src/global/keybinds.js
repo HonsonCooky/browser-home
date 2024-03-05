@@ -28,6 +28,15 @@ let keymaps = {
     s: { name: "Stack Overflow", action: () => externalPageJump("https://stackoverflow.com") },
     t: { name: "Snapchat", action: () => externalPageJump("https://web.snapchat.com") },
     y: { name: "Youtube", action: () => externalPageJump("https://www.youtube.com/") },
+    z: {
+      name: "Z Work",
+      a: { name: "Azure Portal", action: () => externalPageJump("https://portal.azure.com/#home") },
+      b: { name: "Betterworks", action: () => externalPageJump("https://app.betterworks.com") },
+      c: { name: "Confluence", action: () => externalPageJump("https://zenergy.atlassian.net/wiki/home") },
+      d: { name: "DevOps", action: () => externalPageJump("https://dev.azure.com/zenergy") },
+      j: { name: "Jira", action: () => externalPageJump("https://zenergy.atlassian.net/jira/projects") },
+      s: { name: "School", action: () => externalPageJump("https://zacademyelearning.litmos.com") },
+    },
   },
 };
 
