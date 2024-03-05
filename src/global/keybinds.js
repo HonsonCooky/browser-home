@@ -34,6 +34,7 @@ let keymaps = {
       b: { name: "Betterworks", action: () => externalPageJump("https://app.betterworks.com") },
       c: { name: "Confluence", action: () => externalPageJump("https://zenergy.atlassian.net/wiki/home") },
       d: { name: "DevOps", action: () => externalPageJump("https://dev.azure.com/zenergy") },
+      g: { name: "GitHub", action: () => externalPageJump("https://github.com/zenergy") },
       j: { name: "Jira", action: () => externalPageJump("https://zenergy.atlassian.net/jira/projects") },
       s: { name: "School", action: () => externalPageJump("https://zacademyelearning.litmos.com") },
     },
@@ -139,7 +140,7 @@ export function loadGlobalKeybindings() {
     }
   }
 
-  window.addEventListener("keydown", function (event) {
+  window.addEventListener("keydown", function(event) {
     if (
       document.activeElement.tagName === "INPUT" ||
       document.activeElement.classList.contains("layout") ||
