@@ -14,22 +14,32 @@ let keymaps = {
   },
   e: {
     name: "External Links",
-    a: { name: "Advent of Code", action: () => externalPageJump("https://adventofcode.com") },
-    c: { name: "Calendar", action: () => externalPageJump("https://calendar.google.com") },
-    d: { name: "Disney+", action: () => externalPageJump("https://www.disneyplus.com/search") },
-    e: { name: "Exercism", action: () => externalPageJump("https://exercism.org") },
-    g: { name: "GitHub", action: () => externalPageJump("https://github.com/HonsonCooky") },
-    h: { name: "Gmail", action: () => externalPageJump("https://mail.google.com") },
-    i: { name: "Instagram", action: () => externalPageJump("https://www.instagram.com") },
-    m: { name: "Messenger", action: () => externalPageJump("https://www.messenger.com") },
-    n: { name: "Netflix", action: () => externalPageJump("https://www.netflix.com/browse") },
-    o: { name: "Neon", action: () => externalPageJump("https://www.neontv.co.nz") },
-    r: { name: "Reddit", action: () => externalPageJump("https://www.reddit.com") },
-    s: { name: "Stack Overflow", action: () => externalPageJump("https://stackoverflow.com") },
-    t: { name: "Snapchat", action: () => externalPageJump("https://web.snapchat.com") },
-    y: { name: "Youtube", action: () => externalPageJump("https://www.youtube.com/") },
+    e: {
+      name: "Entertainment",
+      d: { name: "Disney+", action: () => externalPageJump("https://www.disneyplus.com/search") },
+      i: { name: "Instagram", action: () => externalPageJump("https://www.instagram.com") },
+      m: { name: "Messenger", action: () => externalPageJump("https://www.messenger.com") },
+      n: { name: "Netflix", action: () => externalPageJump("https://www.netflix.com/browse") },
+      o: { name: "Neon", action: () => externalPageJump("https://www.neontv.co.nz") },
+      s: { name: "Snapchat", action: () => externalPageJump("https://web.snapchat.com") },
+      y: { name: "Youtube", action: () => externalPageJump("https://www.youtube.com/") },
+    },
+    m: {
+      name: "Management",
+      c: { name: "GCalendar", action: () => externalPageJump("https://calendar.google.com") },
+      d: { name: "GDrive", action: () => externalPageJump("https://drive.google.com") },
+      g: { name: "Gmail", action: () => externalPageJump("https://mail.google.com") },
+    },
+    p: {
+      name: "Programming",
+      a: { name: "Advent of Code", action: () => externalPageJump("https://adventofcode.com") },
+      e: { name: "Exercism", action: () => externalPageJump("https://exercism.org") },
+      g: { name: "GitHub", action: () => externalPageJump("https://github.com/HonsonCooky") },
+      r: { name: "Reddit", action: () => externalPageJump("https://www.reddit.com") },
+      s: { name: "Stack Overflow", action: () => externalPageJump("https://stackoverflow.com") },
+    },
     z: {
-      name: "Z Work",
+      name: "Work",
       a: { name: "Azure Portal", action: () => externalPageJump("https://portal.azure.com/#home") },
       b: { name: "Betterworks", action: () => externalPageJump("https://app.betterworks.com") },
       c: { name: "Confluence", action: () => externalPageJump("https://zenergy.atlassian.net/wiki/home") },
@@ -140,7 +150,7 @@ export function loadGlobalKeybindings() {
     }
   }
 
-  window.addEventListener("keydown", function(event) {
+  window.addEventListener("keydown", function (event) {
     if (
       document.activeElement.tagName === "INPUT" ||
       document.activeElement.classList.contains("layout") ||
