@@ -19,7 +19,6 @@ let keymaps = {
       a: { name: "Advent of Code", action: () => externalPageJump("https://adventofcode.com") },
       e: { name: "Exercism", action: () => externalPageJump("https://exercism.org") },
       g: { name: "GitHub", action: () => externalPageJump("https://github.com/HonsonCooky") },
-      r: { name: "Reddit", action: () => externalPageJump("https://www.reddit.com") },
       s: { name: "Stack Overflow", action: () => externalPageJump("https://stackoverflow.com") },
     },
     k: {
@@ -29,16 +28,17 @@ let keymaps = {
       g: { name: "Gmail", action: () => externalPageJump("https://mail.google.com") },
     },
     l: {
-      name: "Entertainment",
+      name: "Socials",
       d: { name: "Disney+", action: () => externalPageJump("https://www.disneyplus.com/search") },
       i: { name: "Instagram", action: () => externalPageJump("https://www.instagram.com") },
       m: { name: "Messenger", action: () => externalPageJump("https://www.messenger.com") },
       n: { name: "Netflix", action: () => externalPageJump("https://www.netflix.com/browse") },
       o: { name: "Neon", action: () => externalPageJump("https://www.neontv.co.nz") },
+      r: { name: "Reddit", action: () => externalPageJump("https://www.reddit.com") },
       s: { name: "Snapchat", action: () => externalPageJump("https://web.snapchat.com") },
       y: { name: "Youtube", action: () => externalPageJump("https://www.youtube.com/") },
     },
-    h: {
+    ";": {
       name: "Work",
       a: { name: "Azure Portal", action: () => externalPageJump("https://portal.azure.com/#home") },
       b: { name: "Betterworks", action: () => externalPageJump("https://app.betterworks.com") },
