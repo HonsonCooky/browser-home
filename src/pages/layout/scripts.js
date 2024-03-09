@@ -100,14 +100,14 @@ window.addEventListener("load", function () {
     const keybindingChar = String.fromCharCode(charIndex);
     const keybindingName = child.title.replace(" layer button", "");
     addKeybinding({
-      keyPath: `i.f.${keybindingChar}`,
+      keyPath: `j.f.${keybindingChar}`,
       name: `.Keyboard Layout.${keybindingName}`,
       action: () => child.click(),
     });
   }
 
   addKeybinding({
-    keyPath: "i.f.k",
+    keyPath: "j.f.k",
     name: "Highlight Key Tool",
     action: () => {
       const curLayout = keyboardSection.querySelector('.layout[style*="display: grid"]');

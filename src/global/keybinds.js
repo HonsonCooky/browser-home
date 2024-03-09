@@ -1,7 +1,7 @@
 const specialKeys = ["Alt", "Control", "Shift"];
 
 let keymaps = {
-  i: {
+  j: {
     name: "Internal Links",
     h: { name: "Home", action: () => internalPageJump("/") },
     c: { name: "Canvas", action: () => internalPageJump("/canvas/") },
@@ -12,9 +12,23 @@ let keymaps = {
     v: { name: "Vim Shortcuts", action: () => internalPageJump("/vim/") },
     w: { name: "Vimium Shortcuts", action: () => internalPageJump("/vimium/") },
   },
-  e: {
+  f: {
     name: "External Links",
-    e: {
+    j: {
+      name: "Programming",
+      a: { name: "Advent of Code", action: () => externalPageJump("https://adventofcode.com") },
+      e: { name: "Exercism", action: () => externalPageJump("https://exercism.org") },
+      g: { name: "GitHub", action: () => externalPageJump("https://github.com/HonsonCooky") },
+      r: { name: "Reddit", action: () => externalPageJump("https://www.reddit.com") },
+      s: { name: "Stack Overflow", action: () => externalPageJump("https://stackoverflow.com") },
+    },
+    k: {
+      name: "Management",
+      c: { name: "GCalendar", action: () => externalPageJump("https://calendar.google.com") },
+      d: { name: "GDrive", action: () => externalPageJump("https://drive.google.com") },
+      g: { name: "Gmail", action: () => externalPageJump("https://mail.google.com") },
+    },
+    l: {
       name: "Entertainment",
       d: { name: "Disney+", action: () => externalPageJump("https://www.disneyplus.com/search") },
       i: { name: "Instagram", action: () => externalPageJump("https://www.instagram.com") },
@@ -24,21 +38,7 @@ let keymaps = {
       s: { name: "Snapchat", action: () => externalPageJump("https://web.snapchat.com") },
       y: { name: "Youtube", action: () => externalPageJump("https://www.youtube.com/") },
     },
-    m: {
-      name: "Management",
-      c: { name: "GCalendar", action: () => externalPageJump("https://calendar.google.com") },
-      d: { name: "GDrive", action: () => externalPageJump("https://drive.google.com") },
-      g: { name: "Gmail", action: () => externalPageJump("https://mail.google.com") },
-    },
-    p: {
-      name: "Programming",
-      a: { name: "Advent of Code", action: () => externalPageJump("https://adventofcode.com") },
-      e: { name: "Exercism", action: () => externalPageJump("https://exercism.org") },
-      g: { name: "GitHub", action: () => externalPageJump("https://github.com/HonsonCooky") },
-      r: { name: "Reddit", action: () => externalPageJump("https://www.reddit.com") },
-      s: { name: "Stack Overflow", action: () => externalPageJump("https://stackoverflow.com") },
-    },
-    z: {
+    h: {
       name: "Work",
       a: { name: "Azure Portal", action: () => externalPageJump("https://portal.azure.com/#home") },
       b: { name: "Betterworks", action: () => externalPageJump("https://app.betterworks.com") },
@@ -66,7 +66,7 @@ export function addKeybinding({ keyPath, name, action }) {
 }
 
 export function removeKeybindingFGroup() {
-  delete keymaps.i.f;
+  delete keymaps.j.f;
 }
 
 function internalPageJump(url) {

@@ -318,7 +318,7 @@ window.addEventListener("load", function () {
     const keybindingChar = String.fromCharCode(charIndex);
     const keybindingName = btn.id.replace(`-${listBtnSuffix}`, "");
     addKeybinding({
-      keyPath: `i.f.${keybindingChar}`,
+      keyPath: `j.f.${keybindingChar}`,
       name: `.ToDo Lists.${keybindingName}`,
       action: () => btn.click(),
     });
@@ -326,13 +326,13 @@ window.addEventListener("load", function () {
 
   function setDefaultListKeybinds() {
     addKeybinding({
-      keyPath: `i.f.+`,
+      keyPath: `j.f.+`,
       name: `.ToDo Lists.Create New List`,
       action: () => newListBtn.click(),
     });
 
     addKeybinding({
-      keyPath: `i.f.D`,
+      keyPath: `j.f.D`,
       name: `.ToDo Lists.Delete Current List`,
       action: deleteList,
     });
