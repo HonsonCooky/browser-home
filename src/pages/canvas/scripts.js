@@ -3,34 +3,59 @@ import "../../global/index";
 
 window.addEventListener("load", function () {
   // Mutable State
-  let startLocation = undefined;
-  let lastLocation = undefined;
-  let currentTool = undefined;
-  let currentWidth = undefined;
-  let currentHeight = undefined;
-  let currentPath = undefined;
-  let currentText = undefined;
   let currentIndex = undefined;
-  let mousedown = false;
-  let locked = false;
+  let shiftLocked = false;
   let currentColor = "--text";
 
+  // Storage
   const cacheTitle = "canvas-drawing";
   const localCache = localStorage.getItem(cacheTitle);
-  const ramCache = localCache ? Array.from(JSON.parse(localCache)) : [];
+  const memCache = localCache ? Array.from(JSON.parse(localCache)) : [];
   const fontSize = 20;
 
   // Load Buttons
   const sidePanel = document.getElementById("canvas-side-panel");
+  const textStyle = "rgba(var(--text))";
+  const highlightStyle = "rgba(var(--teal))";
+
   Array.from(sidePanel.children).forEach((e, i) => {
     e.addEventListener("click", function () {
-      Array.from(sidePanel.children).forEach((e) => (e.querySelector("i").style.color = "rgba(var(--text))"));
-      e.querySelector("i").style.color = "rgba(var(--teal))";
-      currentTool = e.id.split("-")[0];
+      Array.from(sidePanel.children).forEach((e) => {
+        if (e.id != "color-select-btn") e.querySelector("i").style.color = textStyle;
+        else e.querySelector("i").style.color = `rgba(var(${currentColor}))`;
+      });
+      e.querySelector("i").style.color = highlightStyle;
     });
 
     if (i === 0) e.click();
   });
+
+  // Color Swatch
+  const colorSelectPanel = document.getElementById("color-selection");
+  Array.from(colorSelectPanel.children).forEach((btn) => {
+    btn.style.background = `rgba(var(--${btn.id}))`;
+    btn.addEventListener("click", () => {
+      currentColor = `--${btn.id}`;
+      document.getElementById("color-select-btn").querySelector("i").style.color = `rgba(var(${currentColor}))`;
+
+      if (currentIndex != undefined) {
+        memCache[currentIndex] = {
+          ...memCache[currentIndex],
+          color: currentColor,
+        };
+        localStorage.setItem(cacheTitle, JSON.stringify(memCache));
+        render();
+      }
+
+      colorSelectPanel.style.display = "none";
+    });
+  });
+
+  function currentTool() {
+    return Array.from(sidePanel.children)
+      .filter((e) => e.querySelector("i").style.color === highlightStyle)[0]
+      ?.id.split("-")[0];
+  }
 
   // Load Canvas
   const canvas = document.getElementById("draw-canvas");
@@ -60,57 +85,85 @@ window.addEventListener("load", function () {
   }
 
   function getShapeBoundary(shape) {
-    const { x, y, width, height } = shape;
-    let [x1, y1, x2, y2] = [x, y, x + width, y + height];
+    if (shape.type === "rect" || shape.type === "circle") {
+      const { from, to } = shape;
+      if (!from || !to) return {};
+      return { x1: from.x, y1: from.y, x2: to.x, y2: to.y };
+    }
     if (shape.type === "text") {
-      x2 = x1 + context.measureText(shape.text).width;
-      y1 -= fontSize + 2;
-      y2 = y1 + fontSize + 10;
+      const x2 = shape.from.x + context.measureText(shape.text).width;
+      const y1 = shape.from.y - (fontSize + 2);
+      const y2 = y1 + fontSize + 10;
+      return { x1: shape.from.x, y1, x2, y2 };
     }
     if (shape.type === "draw") {
+      if (!shape.path || shape.path.length < 1) return {};
+      let [x1, y1, x2, y2] = [undefined, undefined, undefined, undefined];
       for (const path of shape.path) {
         if (!x1 || path.x < x1) x1 = path.x;
         if (!y1 || path.y < y1) y1 = path.y;
         if (!x2 || path.x > x2) x2 = path.x;
         if (!y2 || path.y > y2) y2 = path.y;
       }
+      return { x1, y1, x2, y2 };
     }
-    return { x1, y1, x2, y2 };
+    return {};
   }
 
   function findClickedShape(e) {
     const { x, y } = getMouseLocation(e);
     const [mouseX, mouseY] = [x, y];
     let clicked = undefined;
-    for (const shape of ramCache) {
+    for (const [shape, index] of memCache.map((s, i) => [s, i])) {
       const { x1, y1, x2, y2 } = getShapeBoundary(shape);
+      if (!x1 || !y1 || !x2 || !y2) return;
       const xBetween = isBetween(mouseX, x1, x2);
       const yBetween = isBetween(mouseY, y1, y2);
       if (xBetween && yBetween) {
-        clicked = shape;
+        clicked = index;
       }
     }
     return clicked;
   }
 
   function getColorHex(color) {
-    const rgb = getComputedStyle(document.documentElement).getPropertyValue(color ?? currentColor);
+    const rgb = getComputedStyle(document.documentElement).getPropertyValue(color);
     const [r, g, b] = rgb.split(",").map((s) => Number(s));
     return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
   }
 
+  function getWidthHeight(shape) {
+    if (!shape.to) return [];
+    let width = shape.to.x - shape.from.x;
+    let height = shape.to.y - shape.from.y;
+
+    if (shape.shiftLocked) {
+      const [oriX, oriY] = [width > 0, height > 0];
+      const value = Math.max(Math.abs(width), Math.abs(height));
+
+      width = oriX ? value : -value;
+      height = oriY ? value : -value;
+    }
+
+    return [width, height];
+  }
+
   function drawRect(shape) {
     context.beginPath();
-    context.roundRect(shape.x, shape.y, shape.width, shape.height, window.innerHeight / (100 / 2));
+    const [width, height] = getWidthHeight(shape);
+    if (!width || !height) return;
+    context.roundRect(shape.from.x, shape.from.y, width, height, window.innerHeight / (100 / 2));
     context.stroke();
   }
 
   const toRads = (degrees) => degrees * (Math.PI / 180);
   function drawEllipse(shape) {
-    const radiiX = shape.width / 2;
-    const radiiY = shape.height / 2;
-    const centerX = shape.x + radiiX;
-    const centerY = shape.y + radiiY;
+    const [width, height] = getWidthHeight(shape);
+    if (!width || !height) return;
+    const radiiX = width / 2;
+    const radiiY = height / 2;
+    const centerX = shape.from.x + radiiX;
+    const centerY = shape.from.y + radiiY;
     context.beginPath();
     context.ellipse(centerX, centerY, Math.abs(radiiX), Math.abs(radiiY), 0, toRads(0), toRads(360));
     context.stroke();
@@ -130,15 +183,16 @@ window.addEventListener("load", function () {
     if (!shape.text) return;
 
     context.font = `${fontSize}px JetBrains Mono`;
-    context.fillText(shape.text, shape.x, shape.y);
+    context.fillText(shape.text, shape.from.x, shape.from.y);
   }
 
   function highlightSelected() {
     if (currentIndex === undefined) return;
-    const shape = ramCache[currentIndex];
+    const shape = memCache[currentIndex];
     if (!shape) return;
 
     const { x1, y1, x2, y2 } = getShapeBoundary(shape);
+    if (!x1 || !y1 || !x2 || !y2) return;
     context.strokeStyle = getColorHex("--red");
     context.setLineDash([5, 5]);
     context.strokeRect(x1, y1, x2 - x1, y2 - y1);
@@ -147,7 +201,7 @@ window.addEventListener("load", function () {
   function render() {
     clearCanvas();
     context.lineWidth = 4;
-    for (const shape of ramCache) {
+    for (const shape of memCache) {
       context.strokeStyle = getColorHex(shape.color);
       context.fillStyle = getColorHex(shape.color);
       context.setLineDash([]);
@@ -170,220 +224,202 @@ window.addEventListener("load", function () {
     highlightSelected();
   }
 
-  function storeShape() {
-    const existing = ramCache[currentIndex];
+  function moveShape(e) {
+    const location = getMouseLocation(e);
+    const shape = memCache[currentIndex];
 
-    const obj = {
-      type: existing?.type ?? currentTool,
-      color: currentColor,
-      x: startLocation?.x ?? existing.x,
-      y: startLocation?.y ?? existing.y,
-      width: existing?.width ?? currentWidth,
-      height: existing?.height ?? currentHeight,
-      path: existing?.path ?? currentPath,
-      text: currentText ?? existing?.text,
-    };
+    if (!location || !shape) return;
 
-    if (currentIndex >= 0 && currentIndex < ramCache.length) {
-      ramCache.splice(currentIndex, 1, obj);
-    } else {
-      ramCache.push(obj);
+    const [diffX, diffY] = [location.x - mouseDownLocation.x, location.y - mouseDownLocation.y];
+
+    if (shape.type === "rect" || shape.type === "circle") {
+      memCache[currentIndex] = {
+        ...shape,
+        from: {
+          x: shape.from.x + diffX,
+          y: shape.from.y + diffY,
+        },
+        to: {
+          x: shape.to.x + diffX,
+          y: shape.to.y + diffY,
+        },
+      };
+    } else if (shape.type === "draw") {
+      const newPath = shape.path.map((p) => {
+        return {
+          x: p.x + diffX,
+          y: p.y + diffY,
+        };
+      });
+      memCache[currentIndex] = {
+        ...shape,
+        from: {
+          x: shape.from.x + diffX,
+          y: shape.from.y + diffY,
+        },
+        path: newPath,
+      };
+    } else if (shape.type === "text") {
+      memCache[currentIndex] = {
+        ...shape,
+        from: {
+          x: shape.from.x + diffX,
+          y: shape.from.y + diffY,
+        },
+      };
     }
+
+    mouseDownLocation = location;
   }
 
   function updateShape(e) {
-    const curLocation = getMouseLocation(e);
-    currentWidth = curLocation.x - startLocation.x;
-    currentHeight = curLocation.y - startLocation.y;
-    if (locked) {
-      const squareRad = Math.max(Math.abs(currentWidth), Math.abs(currentHeight));
-      currentWidth = currentWidth < 0 ? -squareRad : squareRad;
-      currentHeight = currentHeight < 0 ? -squareRad : squareRad;
-    }
-    storeShape();
-  }
+    let location = getMouseLocation(e);
+    const tool = currentTool();
 
-  function updateDraw(e) {
-    const curLocation = getMouseLocation(e);
+    if (!tool || currentIndex === undefined) return;
 
-    if (!lastLocation) {
-      lastLocation = startLocation;
-      currentPath = [];
-    }
-
-    const newPath = { x: curLocation.x, y: curLocation.y };
-    const isLargeDistance = Math.hypot(curLocation.x - lastLocation.x, curLocation.y - lastLocation.y) > 10;
-    const isFreeFlow = (!locked && isLargeDistance) || currentPath.length < 2;
-    if (isFreeFlow) {
-      currentPath.push(newPath);
-      lastLocation = curLocation;
-    } else if (locked) {
-      currentPath.splice(currentPath.length - 1, 1, newPath);
-    }
-    storeShape();
-  }
-
-  function updateText(e) {
-    if (!e.key) {
-      storeShape();
+    // Move Drawing
+    if (tool === "mouse" && mouseDownLocation) {
+      moveShape(e);
       return;
     }
 
-    const key = e.key;
-    if (key.length > 1) {
-      switch (key) {
-        case "Enter":
-          localStorage.setItem(cacheTitle, JSON.stringify(ramCache));
-          reset();
-          break;
-        case "Backspace":
-          currentText = currentText.slice(0, -1);
-          storeShape();
-          break;
-      }
+    // Update Object Values
+    let shape = memCache[currentIndex];
+    if (tool === "rect" || tool === "circle") {
+      memCache[currentIndex] = {
+        ...shape,
+        to: location,
+        shiftLocked,
+      };
       return;
     }
 
-    if (!currentText) currentText = ramCache[currentIndex]?.text ?? "";
-    currentText += key;
-
-    if (currentIndex === undefined) currentIndex = ramCache.length - 1;
-    storeShape();
-  }
-
-  function update(e) {
-    switch (ramCache[currentIndex]?.type ?? currentTool) {
-      case "rect":
-      case "circle":
-        updateShape(e);
-        break;
-      case "draw":
-        updateDraw(e);
-        break;
-      case "text":
-        updateText(e);
-        break;
-    }
-  }
-
-  function moveDrawing(e) {
-    const selectedShape = ramCache[currentIndex];
-    if (!selectedShape) return;
-
-    const curLocation = getMouseLocation(e);
-    if (lastLocation) {
-      const xDiff = curLocation.x - lastLocation.x;
-      const yDiff = curLocation.y - lastLocation.y;
-      const isLargeDistance = Math.hypot(xDiff, yDiff) > 10;
-      if (isLargeDistance) {
-        if (selectedShape.type === "draw") {
-          for (const p of selectedShape.path) {
-            p.x += xDiff;
-            p.y += yDiff;
-          }
+    if (tool === "draw") {
+      let path;
+      if (shape.path) {
+        path = shape.path;
+        let last = shape.path[shape.path.length - 1];
+        if (Math.hypot(location.x - last.x, location.y - last.y) < 10) {
+          return;
         }
-        selectedShape.x += xDiff;
-        selectedShape.y += yDiff;
-        lastLocation = curLocation;
+      } else {
+        path = [location];
       }
-    } else {
-      lastLocation = curLocation;
+
+      if (shiftLocked) path[path.length - 1] = location;
+      else path.push(location);
+
+      memCache[currentIndex] = {
+        ...shape,
+        path,
+      };
+    }
+  }
+
+  function endShape(e) {
+    updateShape(e);
+    const tool = currentTool();
+    if (tool != "text") {
+      if (tool != "mouse") currentIndex = undefined;
+      localStorage.setItem(cacheTitle, JSON.stringify(memCache));
+    }
+  }
+
+  function startShape(e) {
+    const location = getMouseLocation(e);
+    const tool = currentTool();
+
+    if (["rect", "circle", "draw", "text"].includes(tool)) {
+      memCache.push({
+        type: tool,
+        color: currentColor,
+        from: location,
+      });
+      currentIndex = memCache.length - 1;
+    } else if (tool === "mouse") {
+      mouseDownLocation = location;
+      currentIndex = findClickedShape(e);
     }
     render();
   }
 
-  function reset() {
-    startLocation = undefined;
-    lastLocation = undefined;
-    currentWidth = undefined;
-    currentHeight = undefined;
-    currentPath = undefined;
-    currentText = undefined;
-    currentIndex = undefined;
-    locked = false;
-  }
-
-  function startDrawing(e) {
-    if (["rect", "circle", "draw", "text"].includes(currentTool)) {
-      startLocation = getMouseLocation(e);
-      update(e);
-      render();
-    }
-  }
-
-  function endDrawing(e) {
-    if (startLocation) {
-      localStorage.setItem(cacheTitle, JSON.stringify(ramCache));
-      reset();
-      render();
-    }
-  }
-
-  function updateDrawing(e) {
-    if (currentIndex === undefined) currentIndex = ramCache.length - 1;
-    update(e);
-    render();
-  }
+  let mouseDownLocation = undefined;
 
   canvas.addEventListener("mousedown", function (e) {
-    canvas.tabIndex = -1;
-    canvas.focus();
-    mousedown = true;
-    startDrawing(e);
+    startShape(e);
   });
 
   canvas.addEventListener("mouseup", function (e) {
-    mousedown = false;
-    if (currentTool === "mouse") {
-      let clicked = findClickedShape(e);
-      if (clicked && currentIndex === undefined) {
-        currentIndex = ramCache.indexOf(clicked);
-        render();
-      } else {
-        localStorage.setItem(cacheTitle, JSON.stringify(ramCache));
-        reset();
-        render();
-      }
-      return;
-    }
-    if (startLocation && currentTool != "text") endDrawing(e);
+    mouseDownLocation = undefined;
+    endShape(e);
   });
 
   canvas.addEventListener("mousemove", function (e) {
-    if (currentTool === "text") return;
-    if (startLocation) updateDrawing(e);
-    if (currentIndex != undefined && mousedown) moveDrawing(e);
+    updateShape(e);
+    render();
+  });
+
+  document.getElementById("color-select-btn").addEventListener("click", function () {
+    colorSelectPanel.style.display = "flex";
   });
 
   document.getElementById("erase-select-btn").addEventListener("click", function () {
-    ramCache.splice(0, ramCache.length);
+    memCache.splice(0, memCache.length);
     localStorage.removeItem(cacheTitle);
-    reset();
     render();
-    sidePanel.children.item(0).click();
   });
 
   window.addEventListener("keyup", function (event) {
-    if (event.key === "Shift" && currentTool != "text") {
-      locked = false;
+    if (event.key === "Shift") {
+      shiftLocked = false;
     }
   });
 
   window.addEventListener("keydown", function (event) {
-    if (event.key === "Delete" && currentIndex != undefined) {
-      ramCache.splice(currentIndex, 1);
-      localStorage.setItem(cacheTitle, JSON.stringify(ramCache));
-      render();
-    }
+    let shape = memCache[currentIndex];
+    const tool = currentTool();
 
-    if (currentTool === "text" || (currentTool === "mouse" && ramCache[currentIndex]?.type === "text")) {
-      update(event);
+    if (tool === "mouse" && currentIndex != undefined && event.key === "Delete") {
+      memCache.splice(currentIndex, 1);
+      currentIndex = undefined;
+      localStorage.setItem(cacheTitle, JSON.stringify(memCache));
       render();
       return;
     }
 
+    if (tool === "text" || (shape && shape.type === "text")) {
+      if (event.key === "Enter") {
+        currentIndex = undefined;
+        localStorage.setItem(cacheTitle, JSON.stringify(memCache));
+        render();
+        return;
+      }
+
+      const oldIndex = currentIndex;
+
+      if (!shape) {
+        currentIndex = memCache.length - 1;
+        shape = memCache[currentIndex];
+        if (shape.type != "text") return;
+      }
+
+      let text = shape.text ?? "";
+      if (event.key === "Backspace" && text.length > 0) text = text.slice(0, -1);
+      else if (event.key.length === 1) text += event.key;
+
+      memCache[currentIndex] = {
+        ...shape,
+        text,
+      };
+
+      render();
+      currentIndex = oldIndex;
+      return;
+    }
+
     if (event.key === "Shift") {
-      locked = true;
+      shiftLocked = true;
     }
   });
 

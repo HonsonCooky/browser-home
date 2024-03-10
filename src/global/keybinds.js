@@ -159,7 +159,6 @@ export function loadGlobalKeybindings() {
     ) {
       return;
     }
-    console.log(document.activeElement.tagName);
 
     if (event.key === leader || currentKeySequence[0] === leader) {
       keySequence(event);

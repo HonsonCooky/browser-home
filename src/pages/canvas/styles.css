@@ -43,10 +43,30 @@ main {
 
 #canvas-container {
   flex: 95;
-  height: 100%;
+  padding-top: 1vh;
+  height: 80vh;
 }
 
 canvas {
   border-radius: 2vh;
   background: rgba(var(--mantle));
+}
+
+#color-selection {
+  display: none;
+  position: absolute;
+  top: 46%;
+  left: 5%;
+  flex-direction: row;
+  border-radius: 2vh;
+  background: rgba(var(--surface0));
+  padding: 1vh 1vw;
+}
+
+.color-patch {
+  border: none;
+  border-radius: 100vh;
+  background: rgba(var(--base));
+  width: 5vh;
+  height: 5vh;
 }
