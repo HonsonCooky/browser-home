@@ -1,9 +1,9 @@
 {
   "manifest_version": 3,
-  "name": "HonsonCooky Browser Homepage",
+  "name": "HonsonCooky's Browser Homepage",
   "short_name": "HC-Home",
   "version": "1.0.0",
-  "description": "A custom homepage for edge that adds tools and helpful information.",
+  "description": "A custom homepage for Edge that adds tools for HonsonCooky",
   "permissions": ["favicon"],
   "chrome_settings_overrides": {
     "homepage": "https://browser.honsoncooky.dev",
