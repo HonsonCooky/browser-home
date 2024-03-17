@@ -30,11 +30,15 @@ h5 {
   background: rgba(var(--surface0)) !important;
 }
 
-.list-item>span {
+.list-item > span {
   margin: 0 2vw;
 }
 
 li {
   border-radius: 2vh;
   padding: 0.2vh 2vw;
+}
+
+[id$="done-section"] li {
+  text-decoration: line-through;
 }
