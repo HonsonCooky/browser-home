@@ -117,6 +117,17 @@ export function loadKeymap(map) {
     ...map,
   };
   window.addEventListener("keydown", function (evt) {
+    console.log(this.document.activeElement.tagName);
+    if (
+      document.activeElement.tagName === "INPUT" ||
+      document.activeElement.tagName === "TEXTAREA" ||
+      document.activeElement.classList.contains("layout") ||
+      document.activeElement.classList.contains("list") ||
+      document.activeElement.tagName === "CANVAS"
+    ) {
+      return;
+    }
+
     currentSequence.push(evt.key);
     let subMap = map.stringAccess(currentSequence.filter((s) => s != " ").join("."));
     if (!subMap && evt.key === " " && currentSequence.length === 1) subMap = map;

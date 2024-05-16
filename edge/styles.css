@@ -5,7 +5,6 @@ body {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: 100dvh;
 }
 
 h1 {
@@ -19,7 +18,16 @@ h1 {
   }
 }
 
-h2 {
-  font-weight: 300;
-  font-size: var(--fs-1);
+#base {
+  display: grid;
+  grid-template-columns: auto auto 1fr;
+  column-gap: 1vw;
+  row-gap: 1vh;
+  padding: 1vh 4vw;
+  font-size: var(--fs-0);
+}
+
+#base span {
+  display: flex;
+  align-items: center;
 }
