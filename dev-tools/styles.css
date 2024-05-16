@@ -20,6 +20,36 @@ h1 {
 }
 
 h2 {
+  margin: 0;
   font-weight: 300;
-  font-size: var(--fs-1);
+  font-size: var(--fs-3);
+}
+
+#json-to-html {
+  display: flex;
+  flex-direction: column;
+  gap: 2vh;
+  padding: 0 4vw;
+}
+
+#json-to-html div {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 90dvh;
+}
+
+#json-to-html textarea {
+  border-radius: 2vh 2vh 0 0;
+  background: rgba(var(--overlay0));
+  padding: 2vh;
+  height: 18vh;
+  resize: none;
+}
+
+#json-to-html button {
+  border: none;
+  border-radius: 0 0 2vh 2vh;
+  background: rgba(var(--crust));
+  height: 30px;
 }
