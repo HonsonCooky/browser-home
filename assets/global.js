@@ -14,6 +14,7 @@ whichKeyDiv.className = "which-key";
 document.body.appendChild(whichKeyDiv);
 
 const defaultKeymaps = {
+  name: "HonsonCooky",
   j: {
     name: "Internal Links",
     h: { name: "Home", action: () => internalPageJump("/home/") },
