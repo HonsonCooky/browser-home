@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=M+PLUS+1+Code:wght@100..700&display=swap");
+
 :root {
   --base: #faf4ed;
   --surface: #fffaf3;
@@ -62,4 +64,37 @@ html,
 body {
   margin: 0;
   background: var(--base);
+}
+
+* {
+  border-radius: var(--border);
+  color: var(--text);
+  font-weight: inherit;
+  font-size: inherit;
+  font-family: "M PLUS 1 Code", monospace;
+}
+
+.which-key {
+  display: none;
+  position: fixed;
+  bottom: 5dvh;
+  left: 5dvw;
+  column-gap: var(--s-m);
+  flex-direction: row;
+  flex-wrap: wrap;
+  background: var(--overlay);
+  padding: var(--s-3xs) var(--s-xs);
+  width: 90dvw;
+  height: 10dvh;
+
+  &.show {
+    display: flex;
+  }
+
+  h3 {
+    margin: var(--3xs) 0;
+    width: 100%;
+    color: var(--gold);
+    font-weight: 900;
+  }
 }
