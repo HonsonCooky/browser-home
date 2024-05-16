@@ -8,6 +8,61 @@ body {
   height: 100dvh;
 }
 
+main {
+  display: grid;
+  grid-template-columns: 1fr 20fr;
+  grid-template-areas: "panel canvas";
+  width: 100dvw;
+  height: 80dvh;
+
+  #canvas-side-panel {
+    display: flex;
+    row-gap: var(--s-s);
+    grid-area: panel;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  #canvas-container {
+    grid-area: canvas;
+
+    canvas {
+      background: var(--surface);
+    }
+  }
+
+  #color-selection {
+    display: none;
+    position: fixed;
+    top: 50dvh;
+    left: 50dvw;
+    column-gap: var(--s-s);
+    flex-direction: row;
+    align-items: center;
+    transform: translate(-50%, -50%);
+    background: var(--overlay);
+    padding: var(--s-s);
+
+    &.show {
+      display: flex;
+    }
+
+    .color-patch {
+      width: var(--s-m);
+      height: var(--s-m);
+    }
+  }
+}
+
+button {
+  border: none;
+  background: transparent;
+  padding: 0;
+  i {
+    color: inherit;
+  }
+}
+
 h1 {
   color: var(--gold);
   font-weight: 900;
@@ -17,9 +72,4 @@ h1 {
     color: var(--love);
     font-weight: 300;
   }
-}
-
-h2 {
-  font-weight: 300;
-  font-size: var(--fs-1);
 }
