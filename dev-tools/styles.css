@@ -12,11 +12,6 @@ h1 {
   color: var(--gold);
   font-weight: 900;
   font-size: var(--fs-5);
-
-  span {
-    color: var(--love);
-    font-weight: 300;
-  }
 }
 
 h2 {
