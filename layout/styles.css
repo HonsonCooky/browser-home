@@ -19,7 +19,9 @@ h1 {
   }
 }
 
-h2 {
-  font-weight: 300;
-  font-size: var(--fs-1);
+iframe {
+  margin-bottom: var(--s-m);
+  border: none;
+  width: 95dvw;
+  height: 90dvh;
 }

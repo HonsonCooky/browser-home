@@ -128,6 +128,8 @@ export function loadKeymap(map) {
       return;
     }
 
+    evt.preventDefault();
+
     currentSequence.push(evt.key);
     let subMap = map.stringAccess(currentSequence.filter((s) => s != " ").join("."));
     if (!subMap && evt.key === " " && currentSequence.length === 1) subMap = map;
