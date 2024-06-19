@@ -112,23 +112,25 @@ function showSubMap(subMap) {
 
 export function loadKeymap(map) {
   let currentSequence = [];
+
   map = {
     ...defaultKeymaps,
     ...map,
   };
-  window.addEventListener("keydown", function (evt) {
-    console.log(this.document.activeElement.tagName);
-    if (
-      document.activeElement.tagName === "INPUT" ||
-      document.activeElement.tagName === "TEXTAREA" ||
-      document.activeElement.classList.contains("layout") ||
-      document.activeElement.classList.contains("list") ||
-      document.activeElement.tagName === "CANVAS"
-    ) {
-      return;
-    }
 
-    evt.preventDefault();
+  window.addEventListener("keydown", function (evt) {
+    if (evt.key != "Escape" && evt.key != "Enter") {
+      if (
+        document.activeElement.tagName === "INPUT" ||
+        document.activeElement.tagName === "TEXTAREA" ||
+        document.activeElement.classList.contains("layout") ||
+        document.activeElement.classList.contains("list") ||
+        document.activeElement.tagName === "CANVAS"
+      ) {
+        return;
+      }
+      evt.preventDefault();
+    }
 
     currentSequence.push(evt.key);
     let subMap = map.stringAccess(currentSequence.filter((s) => s != " ").join("."));
@@ -140,11 +142,23 @@ export function loadKeymap(map) {
       return;
     }
 
+    evt.preventDefault();
+
     if (!whichKeyDiv.classList.contains("show")) whichKeyDiv.classList.add("show");
+
     if (subMap.action != undefined) {
       currentSequence = [];
       whichKeyDiv.classList.remove("show");
       subMap.action();
     } else showSubMap(subMap);
   });
+}
+
+//-----------------------------------------------------------------------------
+// SHORTCUT LOADING
+//-----------------------------------------------------------------------------
+
+export function loadJsonTemplate(json) {
+  const shortcuts = document.getElementById("shortcuts");
+  const template = document.getElementById("shortcut");
 }

@@ -5,7 +5,8 @@ body {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: 100dvh;
+  height: 0;
+  min-height: 100dvh;
 }
 
 h1 {
@@ -22,4 +23,45 @@ h1 {
 h2 {
   font-weight: 300;
   font-size: var(--fs-1);
+}
+
+label {
+  &:last-of-type {
+    margin-bottom: var(--s-m);
+  }
+}
+
+main {
+  display: flex;
+  flex-direction: column;
+  width: 80vw;
+  height: 80%;
+}
+
+#todos {
+}
+
+#dones {
+  flex-grow: 1;
+}
+
+#input-section {
+  position: sticky;
+  bottom: 0;
+  background-color: var(--base);
+}
+
+#input {
+  display: flex;
+  column-gap: var(--s-m);
+  flex-direction: row;
+
+  input {
+    flex: 1;
+    background-color: var(--surface);
+  }
+
+  button {
+    background-color: var(--overlay);
+  }
 }

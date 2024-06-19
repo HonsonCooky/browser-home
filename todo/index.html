@@ -3,14 +3,32 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>HonsonCooky - Home</title>
+    <title>HonsonCooky - TODO</title>
     <link rel="icon" href="../assets/favicon.png" />
     <link rel="stylesheet" type="text/css" href="./styles.css" />
     <script type="module" src="./scripts.js" defer></script>
   </head>
 
   <body>
-    <h1><span>Kia Ora,</span> HonsonCooky</h1>
-    <h2 id="date"></h2>
+    <header>
+      <h1>TODO</h1>
+    </header>
+    <main>
+      <div id="todos">
+        <h2>ToDo:</h2>
+        <ul></ul>
+      </div>
+      <div id="dones">
+        <h2>Done:</h2>
+      </div>
+      <div id="input-section">
+        <label>[i] Focus Input</label>
+        <label>[Esc] Delete Message</label>
+        <div id="input">
+          <input type="text" />
+          <button type="button">[Enter] Submit</button>
+        </div>
+      </div>
+    </main>
   </body>
 </html>
