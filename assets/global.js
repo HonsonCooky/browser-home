@@ -69,7 +69,9 @@ export function internalPageJump(url) {
   if (window.origin.includes("extension")) {
     const scripts = document.getElementsByTagName("script");
     const currentScriptSrc = scripts[scripts.length - 1].src;
-    window.location.href = currentScriptSrc.replace(/docs.*/, `docs${url}index.html`);
+    const split = currentScriptSrc.split("/");
+    const domain = split.slice(0, 3).join("/");
+    window.location.href = `${domain}/${url}index.html`;
   } else {
     window.location.href = `${window.location.origin}${url}`;
   }
