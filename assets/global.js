@@ -79,30 +79,14 @@ export function externalPageJump(url) {
   window.location.href = url;
 }
 
-Object.prototype.stringAccess = function (s) {
-  s = s.replace(/\[(\w+)\]/g, ".$1"); // convert indexes to properties
-  s = s.replace(/^\./, ""); // strip a leading dot
-  const a = s.split(".");
-  let o = this;
-  for (var i = 0, n = a.length; i < n; ++i) {
-    var k = a[i];
-    if (k in o) {
-      o = o[k];
-    } else {
-      return undefined;
-    }
-  }
-  return o;
-};
-
-function showSubMap(subMap) {
+function whichKeyShow(mapping) {
   whichKeyDiv.innerHTML = "";
 
   const name = document.createElement("h3");
-  name.innerHTML = subMap.name;
+  name.innerHTML = mapping.name;
   whichKeyDiv.appendChild(name);
 
-  for (const [k, v] of Object.entries(subMap)) {
+  for (const [k, v] of Object.entries(mapping)) {
     if (k === "name") continue;
     const key = document.createElement("span");
     key.innerHTML = `[${k}] ${v.name}`;
@@ -110,55 +94,45 @@ function showSubMap(subMap) {
   }
 }
 
-export function loadKeymap(map) {
-  let currentSequence = [];
-
-  map = {
-    ...defaultKeymaps,
-    ...map,
-  };
-
-  window.addEventListener("keydown", function (evt) {
-    if (evt.key != "Escape" && evt.key != "Enter") {
-      if (
-        document.activeElement.tagName === "INPUT" ||
-        document.activeElement.tagName === "TEXTAREA" ||
-        document.activeElement.classList.contains("layout") ||
-        document.activeElement.classList.contains("list") ||
-        document.activeElement.tagName === "CANVAS"
-      ) {
-        return;
-      }
-      evt.preventDefault();
-    }
-
-    currentSequence.push(evt.key);
-    let subMap = map.stringAccess(currentSequence.filter((s) => s != " ").join("."));
-    if (!subMap && evt.key === " " && currentSequence.length === 1) subMap = map;
-
-    if (!subMap) {
-      currentSequence = [];
-      whichKeyDiv.classList.remove("show");
-      return;
-    }
-
-    evt.preventDefault();
-
-    if (!whichKeyDiv.classList.contains("show")) whichKeyDiv.classList.add("show");
-
-    if (subMap.action != undefined) {
-      currentSequence = [];
-      whichKeyDiv.classList.remove("show");
-      subMap.action();
-    } else showSubMap(subMap);
-  });
+function isKeyPressInTextInput(evt) {
+  if (["Enter", "Escape", "Shift", "Control", "Alt", "Meta"].includes(evt.key)) return false;
+  const focusedElement = document.activeElement;
+  return focusedElement && focusedElement.tagName === "INPUT" && focusedElement.type === "text";
 }
 
-//-----------------------------------------------------------------------------
-// SHORTCUT LOADING
-//-----------------------------------------------------------------------------
+function keyListener(evt) {
+  if (!this || isKeyPressInTextInput(evt)) return;
 
-export function loadJsonTemplate(json) {
-  const shortcuts = document.getElementById("shortcuts");
-  const template = document.getElementById("shortcut");
+  // Get the new mapping. If space is pressed, then the base layer is shown (if no other key is already pressed)
+  const isSpace = evt.key === " " && this.current.isBase;
+  const newMapping = isSpace ? this.current : this.current[evt.key];
+
+  // Reset on escape or invalid mapping
+  if (!newMapping || (evt.key === "Escape" && !newMapping)) {
+    whichKeyDiv.classList.remove("show");
+    this.current = { ...this.all };
+    return;
+  }
+
+  // Valid mapping with action - leaf node with something to do.
+  if (newMapping.action) {
+    whichKeyDiv.classList.remove("show");
+    this.current = { ...this.all };
+    newMapping.action();
+    evt.preventDefault();
+    return;
+  }
+
+  // Valid mapping without action - contains sub actions.
+  if (!whichKeyDiv.classList.contains("show")) whichKeyDiv.classList.add("show");
+  this.current = newMapping;
+  whichKeyShow(this.current);
+}
+
+export function loadKeymap(givenMap) {
+  const allMappings = { ...defaultKeymaps, ...givenMap, isBase: true };
+  const mapContext = { all: allMappings, current: allMappings };
+
+  window.onkeydown = null;
+  window.addEventListener("keydown", keyListener.bind(mapContext));
 }

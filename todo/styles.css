@@ -39,16 +39,56 @@ main {
 }
 
 #todos {
+  display: none;
+  column-gap: var(--s-m);
+  flex-direction: row;
+
+  :nth-child(1) {
+    flex: 1;
+  }
+
+  :nth-child(2) {
+    flex: 4;
+  }
 }
 
 #dones {
-  flex-grow: 1;
+  display: none;
+  column-gap: var(--s-m);
+  flex-direction: row;
+
+  :nth-child(1) {
+    flex: 1;
+  }
+
+  :nth-child(2) {
+    flex: 4;
+  }
+}
+
+ul {
+  padding: 0;
+  list-style: none;
+
+  li {
+    padding: var(--s-3xs) var(--s-m);
+    text-align: end;
+    text-wrap: wrap;
+
+    &.selected {
+      background: var(--gold);
+      color: var(--base);
+    }
+  }
 }
 
 #input-section {
-  position: sticky;
+  position: absolute;
   bottom: 0;
+  left: 0;
   background-color: var(--base);
+  padding: var(--s-m);
+  width: calc(100% - var(--s-m) * 2);
 }
 
 #input {
