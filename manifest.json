@@ -10,7 +10,7 @@
     "startup_pages": ["https://browser.honsoncooky.dev"]
   },
   "chrome_url_overrides": {
-    "newtab": "./docs/index.html"
+    "newtab": "./index.html"
   },
   "icons": {
     "48": "./src/assets/HC_LOGO_LIGHT_48x48.png",
