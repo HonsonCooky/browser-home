@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "HonsonCooky's Browser Homepage",
   "short_name": "HC-Home",
-  "version": "1.0.0",
+  "version": "3.0.0",
   "description": "A custom homepage for Edge that adds tools for HonsonCooky",
   "permissions": ["favicon"],
   "chrome_settings_overrides": {
@@ -13,7 +13,6 @@
     "newtab": "./index.html"
   },
   "icons": {
-    "48": "./src/assets/HC_LOGO_LIGHT_48x48.png",
-    "128": "./src/assets/HC_LOGO_LIGHT_128x128.png"
+    "128": "./assets/favicon.png"
   }
 }
