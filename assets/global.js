@@ -89,7 +89,7 @@ function whichKeyShow(mapping) {
   whichKeyDiv.appendChild(name);
 
   for (const [k, v] of Object.entries(mapping)) {
-    if (k === "name") continue;
+    if (k === "name" || k === "isBase") continue;
     const key = document.createElement("span");
     key.innerHTML = `[${k}] ${v.name}`;
     whichKeyDiv.appendChild(key);
@@ -116,12 +116,13 @@ function keyListener(evt) {
     return;
   }
 
+  evt.preventDefault();
+
   // Valid mapping with action - leaf node with something to do.
   if (newMapping.action) {
     whichKeyDiv.classList.remove("show");
     this.current = { ...this.all };
     newMapping.action();
-    evt.preventDefault();
     return;
   }
 

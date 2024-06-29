@@ -85,8 +85,9 @@ body {
   flex-wrap: wrap;
   background: var(--overlay);
   padding: var(--s-3xs) var(--s-xs);
-  width: 90dvw;
+  width: calc(90dvw - (var(--s-xs) * 2));
   height: 10dvh;
+  font-size: var(--fs-0);
 
   &.show {
     display: flex;

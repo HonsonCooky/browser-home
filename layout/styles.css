@@ -5,18 +5,10 @@ body {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: 100dvh;
 }
 
 h1 {
   color: var(--gold);
   font-weight: 900;
   font-size: var(--fs-5);
-}
-
-iframe {
-  margin-bottom: var(--s-m);
-  border: none;
-  width: 95dvw;
-  height: 90dvh;
 }
