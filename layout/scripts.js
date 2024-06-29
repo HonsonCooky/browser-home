@@ -61,9 +61,9 @@ function generateHtmlElements(map) {
 			})
 			.map(({ slice, count }) => {
 				const diff = max - count;
-				const middle = Math.floor(diff / 2);
+				const middle = count / 2;
 				const fill = new Array(diff).fill(undefined);
-				slice.splice(middle + 1, 0, ...fill);
+				slice.splice(middle, 0, ...fill);
 				return slice;
 			});
 
@@ -80,7 +80,7 @@ function generateHtmlElements(map) {
 					const [type, value] = key.split(" ");
 					const typeSpan = document.createElement("span");
 					typeSpan.innerText = type;
-					typeSpan.className = "type";
+					typeSpan.className = ["&magic", "&sl", "&tog"].includes(type) ? "special-type" : "type";
 					keyDiv.appendChild(typeSpan);
 
 					if (value) {
