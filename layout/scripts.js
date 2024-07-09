@@ -1,30 +1,6 @@
 import { loadKeymap } from "../assets/global.js";
 loadKeymap();
 
-// Honestly, I just fiddled till I got something that looked like JSON... haha
-function keymapToJson(keymapTxt) {
-	const keymapIndex = keymapTxt.indexOf("keymap {");
-	if (keymapIndex === -1) {
-		console.error("Unable to find keymap in keymap file");
-		return;
-	}
-	const mapping = keymapTxt
-		.substring(keymapIndex + 6, keymapTxt.length - 5)
-		.replaceAll(";", ",")
-		.replaceAll("<", "{")
-		.replaceAll(">", "}")
-		.replaceAll(/(\w+)\s*\{/g, (match) => `"${match.substring(0, match.length - 2)}" = {`)
-		.replaceAll(/(\w+)\s*=/g, (match) => `"${match.substring(0, match.length - 2)}" =`)
-		.replaceAll(" =", ":")
-		.replaceAll(/(&\S{2,})+( \S+)*\s*/g, (match) => {
-			if (match.includes('"')) return match;
-			return `"${match.trim()}",\n`;
-		})
-		.replaceAll(/("bindings":)\s*{([^}]*)}/g, "$1 [$2]")
-		.replaceAll(/,\s*],/g, "]")
-		.replaceAll(/,\s*([}\]])/g, "$1");
-	return JSON.parse(mapping);
-}
 
 function generateHtmlElements(map) {
 	// I'd rather just hard-code this information
@@ -104,17 +80,15 @@ function generateHtmlElements(map) {
 }
 
 async function loadMapping() {
-	const keymapTxt = await fetch("./layout.keymap").then((res) => res.text());
-	if (!keymapTxt) {
+	const keymap = await fetch("./layout.json").then((res) => res.json());
+	if (!keymap) {
 		console.error("Unable to load keymap file");
 		return;
 	}
 
-	const keymapDiv = document.getElementById("keymap");
-	const map = keymapToJson(keymapTxt);
-	const layers = generateHtmlElements(map);
+	const layers = generateHtmlElements(keymap);
 	layers.forEach((element) => {
-		keymapDiv.appendChild(element);
+		document.getElementById("keymap").appendChild(element);
 	});
 }
 
